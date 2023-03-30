@@ -23,6 +23,21 @@ Development requires:
 - SDL2 library
 - SDL_ttf library
 
+### Installing libraries
+SDL_ttf can be installed [here](https://github.com/libsdl-org/SDL_ttf/releases). Use the Windows development version 
+for 64bit (mingw.tar.gz).
+SDL2 can be installed [here](https://wiki.libsdl.org/SDL2/Installation).
+
+The following files must be place in `/cmake-build-debug`:
+- `libSDL2_ttf.a`
+- `libSDL2_ttf.dll.a`
+- `libSDL2_ttf.la`
+- `SDL2.dll`
+- `SDL2.lib`
+- `SDL2_ttf.dll`
+- `SDL2main.lib`
+- `SDL2test.lib`
+
 ### Coming features
 - Real-time analytics calculation
 - Real-time analytics display
