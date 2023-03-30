@@ -26,12 +26,15 @@ void populate_analytics_string(char **string, Environment const *env) {
 
     SimulationAnalytics data = env->data;
     float percent_alive = ((float) (data.total_cells) / (float) (env->width * env->height)) * 100.0f;
+    float growth = ((float) data.total_cells / (float) data.initial_cells) * 100.0f;
 
     asprintf(
             string,
-            "cells: %lu\npercentage alive: %.2f%%\n",
-            env->data.total_cells,
-            percent_alive
+            "initial cells: %u\ncells: %lu\npercentage alive: %.3f%%\ngrowth: %.1f%%",
+            data.initial_cells,
+            data.total_cells,
+            percent_alive,
+            growth
     );
 }
 
@@ -58,7 +61,10 @@ Environment *init_environment(int width, int height) {
     for (int i = 0; i < size; i++) {
         env->grid[i] = false; // All values initialized to false
     }
+
+    // Simulation data
     env->data.total_cells = 0;
+    env->data.initial_cells = 0;
 
     return env;
 }
@@ -220,6 +226,7 @@ void next_generation(Environment *env) {
  * @param seed The seed to be placed in the simulation
  */
 void place_seed(Environment *env, Seed *seed) {
+    env->data.initial_cells = seed->cells; // Record initial cells
     for (int i = 0; i < seed->cells; i++) {
         Coordinate coord = seed->points[i];
         write(env, coord.x, coord.y, true);

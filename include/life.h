@@ -11,6 +11,7 @@
 // Custom types
 typedef struct sim_data {
     long unsigned int total_cells;
+    unsigned int initial_cells;
 } SimulationAnalytics;
 
 typedef struct environment {

@@ -39,7 +39,4 @@ The following files must be place in `/cmake-build-debug`:
 - `SDL2test.lib`
 
 ### Coming features
-- Real-time analytics calculation
-- Real-time analytics display
 - Analytics CSV file
-- Show & hide of analytics
