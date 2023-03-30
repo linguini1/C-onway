@@ -90,10 +90,10 @@ int main(int argc, char **argv) {
                     playing = !playing;
                 }
                 // Speed controls
-                if (key == SDLK_UP && frame_delay <= MAX_FRAME_DELAY - FRAME_DELAY_STEP) {
-                    frame_delay += FRAME_DELAY_STEP; // Speed up
-                } else if (key == SDLK_DOWN && frame_delay >= FRAME_DELAY_STEP) {
-                    frame_delay -= FRAME_DELAY_STEP; // Slow down
+                if (key == SDLK_DOWN && frame_delay <= MAX_FRAME_DELAY - FRAME_DELAY_STEP) {
+                    frame_delay += FRAME_DELAY_STEP; // Slow down
+                } else if (key == SDLK_UP && frame_delay >= FRAME_DELAY_STEP) {
+                    frame_delay -= FRAME_DELAY_STEP; // Speed up
                 } else if (key == SDLK_m) {
                     frame_delay = 0;  // Max speed
                 }
