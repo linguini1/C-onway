@@ -22,8 +22,17 @@ const Coordinate NEIGHBOURS[8] = {
         {-1, 1} // Lower left
 };
 
-void populate_analytics_string(char **string, Environment const *env){
-    asprintf(string, "cells: %lu\n", env->data.total_cells);
+void populate_analytics_string(char **string, Environment const *env) {
+
+    SimulationAnalytics data = env->data;
+    float percent_alive = ((float) (data.total_cells) / (float) (env->width * env->height)) * 100.0f;
+
+    asprintf(
+            string,
+            "cells: %lu\npercentage alive: %.2f%%\n",
+            env->data.total_cells,
+            percent_alive
+    );
 }
 
 /**
