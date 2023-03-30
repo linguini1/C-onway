@@ -14,3 +14,6 @@
 1298	1428	7018952037259717	conway.exe	5adbbbb6afb86af6
 3	1147	7018952169703255	CMakeFiles/conway.dir/src/main.c.obj	72761366e0613550
 3	120	7018952336027357	conway.exe	5adbbbb6afb86af6
+9	504	7018960429704359	CMakeFiles/conway.dir/src/palettes.c.obj	705fe6b440de2be5
+3	992	7018960434604461	CMakeFiles/conway.dir/src/main.c.obj	72761366e0613550
+992	1122	7018960435842661	conway.exe	5adbbbb6afb86af6

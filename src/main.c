@@ -20,7 +20,7 @@ const char WINDOW_NAME[] = "Geometry Visualizer";
 const Coordinate MAP_CENTER = {GAME_WIDTH / 2, GAME_HEIGHT / 2};
 
 // Simulation parameters
-Palette game_palette = IBM8503;
+Palette game_palette = MonitorGlow;
 const int DEFAULT_FRAME_DELAY = 200;
 const int MAX_FRAME_DELAY = 1000;
 const int FRAME_DELAY_STEP = 25;

@@ -34,6 +34,30 @@ void reset_palette(Palette *palette, SDL_KeyCode key) {
         case SDLK_1:
             *palette = (Palette) Nokia3310;
             break;
+        case SDLK_2:
+            *palette = (Palette) EndGame;
+            break;
+        case SDLK_3:
+            *palette = (Palette) PaperAndDust;
+            break;
+        case SDLK_4:
+            *palette = (Palette) IBM8503;
+            break;
+        case SDLK_5:
+            *palette = (Palette) OngBit;
+            break;
+        case SDLK_6:
+            *palette = (Palette) PaperBack;
+            break;
+        case SDLK_7:
+            *palette = (Palette) IronBlues;
+            break;
+        case SDLK_8:
+            *palette = (Palette) Casio;
+            break;
+        case SDLK_9:
+            *palette = (Palette) SpriteZero;
+            break;
         default:
             *palette = (Palette) MonitorGlow; // Also handles key 0
             break;
