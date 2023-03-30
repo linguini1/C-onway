@@ -25,7 +25,7 @@ Palette game_palette = MonitorGlow;
 const int DEFAULT_FRAME_DELAY = 200;
 const int MAX_FRAME_DELAY = 1000;
 const int FRAME_DELAY_STEP = 25;
-const int FONT_SIZE = 12;
+const int FONT_SIZE = 14;
 
 int main(int argc, char **argv) {
 
@@ -134,9 +134,11 @@ int main(int argc, char **argv) {
             char *analytics_string;
             populate_analytics_string(&analytics_string, environment);
 
-            // Wrap after width exceeded or on \n
             SDL_Surface *analytics_text = TTF_RenderText_Solid_Wrapped(
-                    font, analytics_string, game_palette.light, WIDTH
+                    font,
+                    analytics_string,
+                    dark_mode ? game_palette.light : game_palette.dark, // Switch colour with toggle
+                    WIDTH  // Wrap on \n or when width is larger than window width
             );
             SDL_Texture *analytics = SDL_CreateTextureFromSurface(renderer, analytics_text);
             SDL_Rect analytics_rect = {0, 0, analytics_text->w, analytics_text->h}; // Top left corner
