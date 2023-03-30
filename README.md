@@ -11,6 +11,7 @@ No installation required, just run `conway.exe`.
 ### Controls
 - To pause and play the simulation, press the space bar.
 - To increase or decrease the speed of the simulation, use the up & down arrow keys.
+  - To max out the speed, press the `m` key.
 - To show or hide the analytics, press the `a` key.
 
 ## Development
@@ -22,5 +23,4 @@ Development requires:
 - Real-time analytics calculation
 - Real-time analytics display
 - Analytics CSV file
-- Simulation speed controls
 - Show & hide of analytics

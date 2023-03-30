@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <SDL.h>
+#include <Windows.h>
 #include "life.h"
 #include "palettes.h"
 
@@ -20,6 +21,9 @@ const Coordinate MAP_CENTER = {GAME_WIDTH / 2, GAME_HEIGHT / 2};
 
 // Simulation parameters
 Palette game_palette = IBM8503;
+const int DEFAULT_FRAME_DELAY = 200;
+const int MAX_FRAME_DELAY = 1000;
+const int FRAME_DELAY_STEP = 25;
 
 int main(int argc, char **argv) {
 
@@ -54,6 +58,7 @@ int main(int argc, char **argv) {
     // Runtime variables
     bool running = true; // For quitting the animation
     bool playing = true; // For play and pause
+    int frame_delay = DEFAULT_FRAME_DELAY; // Length of each frame
     SDL_Event event; // For capturing events
 
     // Simulation assets
@@ -72,6 +77,14 @@ int main(int argc, char **argv) {
                 // Pause & play
                 if (event.key.keysym.sym == SDLK_SPACE){
                     playing = !playing;
+                }
+                // Speed controls
+                if (event.key.keysym.sym == SDLK_UP && frame_delay <= MAX_FRAME_DELAY - FRAME_DELAY_STEP){
+                    frame_delay += FRAME_DELAY_STEP; // Speed up
+                } else if (event.key.keysym.sym == SDLK_DOWN && frame_delay >= FRAME_DELAY_STEP){
+                    frame_delay -= FRAME_DELAY_STEP; // Slow down
+                } else if (event.key.keysym.sym == SDLK_m){
+                    frame_delay = 0;  // Max speed
                 }
             }
         }
@@ -96,6 +109,7 @@ int main(int argc, char **argv) {
         }
 
         // Show what was drawn
+        Sleep(frame_delay);
         SDL_RenderPresent(renderer);
     }
 
