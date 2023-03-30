@@ -9,10 +9,12 @@ No installation required, just run `conway.exe`.
 
 ## Usage
 ### Controls
-- To pause and play the simulation, press the space bar.
-- To increase or decrease the speed of the simulation, use the up & down arrow keys.
-  - To max out the speed, press the `m` key.
-- To show or hide the analytics, press the `a` key.
+- Pause and play with the space bar.
+- Increase or decrease the simulation speed using the up & down arrow keys.
+  - Toggle max speed with the `m` key.
+- Select themes using the number keys `0-9`.
+- Toggle dark mode with the `d` key.
+- Toggle live analytics with the `a` key.
 
 ## Development
 Development requires:

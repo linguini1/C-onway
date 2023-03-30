@@ -58,6 +58,7 @@ int main(int argc, char **argv) {
     // Runtime variables
     bool running = true; // For quitting the animation
     bool playing = true; // For play and pause
+    bool dark_mode = true; // Simulation runs in dark mode
     int frame_delay = DEFAULT_FRAME_DELAY; // Length of each frame
     SDL_Event event; // For capturing events
 
@@ -74,25 +75,36 @@ int main(int argc, char **argv) {
 
             // Keypress events
             if (event.type == SDL_KEYDOWN){
+
+                SDL_KeyCode key = event.key.keysym.sym;
+
                 // Pause & play
-                if (event.key.keysym.sym == SDLK_SPACE){
+                if ( key == SDLK_SPACE){
                     playing = !playing;
                 }
                 // Speed controls
-                if (event.key.keysym.sym == SDLK_UP && frame_delay <= MAX_FRAME_DELAY - FRAME_DELAY_STEP){
+                if (key == SDLK_UP && frame_delay <= MAX_FRAME_DELAY - FRAME_DELAY_STEP){
                     frame_delay += FRAME_DELAY_STEP; // Speed up
-                } else if (event.key.keysym.sym == SDLK_DOWN && frame_delay >= FRAME_DELAY_STEP){
+                } else if (key == SDLK_DOWN && frame_delay >= FRAME_DELAY_STEP){
                     frame_delay -= FRAME_DELAY_STEP; // Slow down
-                } else if (event.key.keysym.sym == SDLK_m){
+                } else if (key == SDLK_m){
                     frame_delay = 0;  // Max speed
+                }
+                // Switch theme
+                if (0x30 <= key && key <= 0x39){
+                    reset_palette(&game_palette, key);
+                }
+                // Toggle dark mode
+                if (key == SDLK_d){
+                    dark_mode = !dark_mode;
                 }
             }
         }
 
         // Clear screen
-        set_draw_colour(renderer, &game_palette, false); // Dead cell colour
+        set_draw_colour(renderer, &game_palette, !dark_mode); // Dead cell colour
         SDL_RenderClear(renderer);
-        set_draw_colour(renderer, &game_palette, true); // Living cell colour
+        set_draw_colour(renderer, &game_palette, dark_mode); // Living cell colour
 
         // Draw cells
         for (int x = 0; x < GAME_WIDTH; x++){

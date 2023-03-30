@@ -24,3 +24,18 @@ void set_draw_colour(SDL_Renderer *renderer, Palette const *palette, bool light)
     // Set draw colour
     SDL_SetRenderDrawColor(renderer, colour.r, colour.g, colour.b, 255);
 }
+
+/**
+ * Resets the palette to the specified palette.
+ * @param palette
+ */
+void reset_palette(Palette *palette, SDL_KeyCode key) {
+    switch (key) {
+        case SDLK_1:
+            *palette = (Palette) Nokia3310;
+            break;
+        default:
+            *palette = (Palette) MonitorGlow; // Also handles key 0
+            break;
+    }
+}
