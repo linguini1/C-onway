@@ -3,17 +3,15 @@
  * @author Matteo Golin
  * @version 1.0
 */
+#ifndef CONWAY_PALETTES_H
+#define CONWAY_PALETTES_H
+#include <SDL.h>
+#include <stdbool.h>
 
 // Custom types
-typedef struct rgb {
-    short unsigned int r;
-    short unsigned int g;
-    short unsigned int b;
-} RGB;
-
 typedef struct palette {
-    RGB light;
-    RGB dark;
+    SDL_Color light;
+    SDL_Color dark;
 } Palette;
 
 // Some included palettes
@@ -32,3 +30,5 @@ typedef struct palette {
 void set_draw_colour(SDL_Renderer *renderer, Palette const *palette, bool light);
 
 void reset_palette(Palette *palette, SDL_KeyCode key);
+
+#endif

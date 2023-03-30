@@ -3,12 +3,13 @@
  * @author Matteo Golin
  * @version 1.0
  */
+#include "palettes.h"
+#include "life.h"
 #include <stdio.h>
 #include <stdbool.h>
 #include <SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include <Windows.h>
-#include "life.h"
-#include "palettes.h"
 
 // Constants
 const int WIDTH = 700;
@@ -37,6 +38,11 @@ int main(int argc, char **argv) {
         printf("Could not initialize SDL: %s\n", SDL_GetError());
     }
 
+    // Start SDL_ttf
+    if (TTF_Init() < 0){
+        printf("Could not initialize SDL_ttf: %s\n", TTF_GetError());
+    }
+
     // Create window
     SDL_Window *window = SDL_CreateWindow(
             WINDOW_NAME,
@@ -60,6 +66,7 @@ int main(int argc, char **argv) {
     bool playing = true; // For play and pause
     bool dark_mode = true; // Simulation runs in dark mode
     int frame_delay = DEFAULT_FRAME_DELAY; // Length of each frame
+    TTF_Font *font = TTF_OpenFont("..\\src\\uni0553.ttf", 8); // Analytics font and size TODO fix path
     SDL_Event event; // For capturing events
 
     // Simulation assets
@@ -115,6 +122,14 @@ int main(int argc, char **argv) {
             }
         }
 
+        // Draw analytics
+        char *analytics_string;
+        populate_analytics_string(&analytics_string, environment);
+        SDL_Surface* analytics_text = TTF_RenderText_Solid(font, analytics_string, game_palette.light);
+        SDL_Texture* analytics = SDL_CreateTextureFromSurface(renderer, analytics_text);
+        SDL_Rect analytics_rect = {0, 0, analytics_text->w, analytics_text->h};
+        SDL_RenderCopy(renderer, analytics, NULL, &analytics_rect);
+
         // Calculate the next generation
         if (playing){
             next_generation(environment);
@@ -129,6 +144,7 @@ int main(int argc, char **argv) {
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
+
     // Release simulation assets
     destroy_env(environment);
     destroy_seed(seed);

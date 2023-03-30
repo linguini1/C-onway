@@ -52,21 +52,21 @@ build cmake_object_order_depends_target_conway: phony || CMakeFiles/conway.dir
 build CMakeFiles/conway.dir/src/life.c.obj: C_COMPILER__conway_Debug C$:/coding/C/conway/src/life.c || cmake_object_order_depends_target_conway
   DEP_FILE = CMakeFiles\conway.dir\src\life.c.obj.d
   FLAGS = -g -std=gnu99
-  INCLUDES = -IC:/MinGW/include/SDL2/include -IC:/coding/C/conway/./include
+  INCLUDES = -IC:/MinGW/include/SDL2/include -IC:/MinGW/include/SDL2_ttf/x86_64-w64-mingw32/include -IC:/coding/C/conway/./include
   OBJECT_DIR = CMakeFiles\conway.dir
   OBJECT_FILE_DIR = CMakeFiles\conway.dir\src
 
 build CMakeFiles/conway.dir/src/main.c.obj: C_COMPILER__conway_Debug C$:/coding/C/conway/src/main.c || cmake_object_order_depends_target_conway
   DEP_FILE = CMakeFiles\conway.dir\src\main.c.obj.d
   FLAGS = -g -std=gnu99
-  INCLUDES = -IC:/MinGW/include/SDL2/include -IC:/coding/C/conway/./include
+  INCLUDES = -IC:/MinGW/include/SDL2/include -IC:/MinGW/include/SDL2_ttf/x86_64-w64-mingw32/include -IC:/coding/C/conway/./include
   OBJECT_DIR = CMakeFiles\conway.dir
   OBJECT_FILE_DIR = CMakeFiles\conway.dir\src
 
 build CMakeFiles/conway.dir/src/palettes.c.obj: C_COMPILER__conway_Debug C$:/coding/C/conway/src/palettes.c || cmake_object_order_depends_target_conway
   DEP_FILE = CMakeFiles\conway.dir\src\palettes.c.obj.d
   FLAGS = -g -std=gnu99
-  INCLUDES = -IC:/MinGW/include/SDL2/include -IC:/coding/C/conway/./include
+  INCLUDES = -IC:/MinGW/include/SDL2/include -IC:/MinGW/include/SDL2_ttf/x86_64-w64-mingw32/include -IC:/coding/C/conway/./include
   OBJECT_DIR = CMakeFiles\conway.dir
   OBJECT_FILE_DIR = CMakeFiles\conway.dir\src
 
@@ -80,8 +80,8 @@ build CMakeFiles/conway.dir/src/palettes.c.obj: C_COMPILER__conway_Debug C$:/cod
 
 build conway.exe: C_EXECUTABLE_LINKER__conway_Debug CMakeFiles/conway.dir/src/life.c.obj CMakeFiles/conway.dir/src/main.c.obj CMakeFiles/conway.dir/src/palettes.c.obj
   FLAGS = -g
-  LINK_LIBRARIES = -lSDL2main  -lSDL2  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
-  LINK_PATH = -LC:/MinGW/include/SDL2/lib/x64
+  LINK_LIBRARIES = -lSDL2main  -lSDL2  -lSDL2_ttf  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
+  LINK_PATH = -LC:/MinGW/include/SDL2/lib/x64   -LC:/MinGW/include/SDL2_ttf/x86_64-w64-mingw32/lib
   OBJECT_DIR = CMakeFiles\conway.dir
   POST_BUILD = cd .
   PRE_LINK = cd .

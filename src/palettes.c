@@ -15,7 +15,7 @@
  */
 void set_draw_colour(SDL_Renderer *renderer, Palette const *palette, bool light) {
 
-    RGB colour; // Select the colour to be used
+    SDL_Color colour; // Select the colour to be used
     if (light) {
         colour = palette->light;
     } else {

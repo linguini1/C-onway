@@ -3,11 +3,12 @@
  * @author Matteo Golin
  * @version 1.0
 */
+#include "life.h"
+#include "asprintf.h"
 #include <stdlib.h>
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
-#include "life.h"
 
 // Constants
 const Coordinate NEIGHBOURS[8] = {
@@ -21,6 +22,10 @@ const Coordinate NEIGHBOURS[8] = {
         {-1, 1} // Lower left
 };
 
+void populate_analytics_string(char **string, Environment const *env){
+    asprintf(string, "cells: %lu\n", env->data.total_cells);
+}
+
 /**
  * Create the Environment (grid) for cell growth to occur in, starting with all dead cells.
  * @param width The width of the environment
@@ -32,7 +37,7 @@ Environment *init_environment(int width, int height) {
     int size = width * height;
 
     // Create environment
-    Environment *env = malloc(sizeof(Environment));
+    Environment *env = (Environment *) malloc(sizeof(Environment));
     assert(env != NULL);
 
     env->grid = (bool *) malloc(sizeof(bool) * size);
@@ -44,6 +49,7 @@ Environment *init_environment(int width, int height) {
     for (int i = 0; i < size; i++) {
         env->grid[i] = false; // All values initialized to false
     }
+    env->data.total_cells = 0;
 
     return env;
 }
@@ -54,6 +60,7 @@ Environment *init_environment(int width, int height) {
  */
 void destroy_env(Environment *env) {
     free(&(env->grid));
+    free(&(env->data));
     free(env);
 }
 
@@ -100,7 +107,7 @@ void write(Environment *env, int x, int y, bool value) {
  * @param coord
  * @return The wrapped coordinate
  */
-Coordinate wrap(Environment *env, Coordinate coord) {
+Coordinate wrap(Environment const *env, Coordinate coord) {
     if (coord.x < 0) {
         coord.x += env->width;
     }
@@ -156,20 +163,12 @@ bool next_state(Environment const *env, int x, int y) {
 
     // If a cell is alive:
     if (cell_state) {
-
-        // If 1 or fewer neighbours, it dies
-        if (neighbours <= 1) {
-            return false;
-        }
-
+        if (neighbours <= 1 || neighbours >= 4) {
+            // If 1 or fewer neighbours, it dies
             // If 4 or more neighbours, it dies
-        else if (neighbours >= 4) {
             return false;
-        }
-
-            // If it has 2-3 neighbours, it stays alive
-        else {
-            return true;
+        } else {
+            return true;  // If it has 2-3 neighbours, it stays alive
         }
     }
 
@@ -186,11 +185,20 @@ bool next_state(Environment const *env, int x, int y) {
  */
 void next_generation(Environment *env) {
 
+    // Reset cell total
+    env->data.total_cells = 0;
+
     // Update the copy with all the new states
     bool *copy = (bool *) malloc(sizeof(bool) * env->width * env->height);
     for (int x = 0; x < env->width; x++) {
         for (int y = 0; y < env->height; y++) {
-            copy[(env->width * y) + x] = next_state(env, x, y); // Write next state onto the copy
+            bool state = next_state(env, x, y);
+
+            // Increase cell total
+            if (state) {
+                env->data.total_cells++;
+            }
+            copy[(env->width * y) + x] = state; // Write next state onto the copy
         }
     }
     free(env->grid);
