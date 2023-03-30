@@ -129,7 +129,9 @@ int main(int argc, char **argv) {
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
+    // Release simulation assets
     destroy_env(environment);
+    destroy_seed(seed);
 
     return 0;
 }

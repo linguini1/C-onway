@@ -17,7 +17,7 @@ const Coordinate NEIGHBOURS[8] = {
         {-1, 0}, // Left
         {1,  -1}, // Upper right
         {1,  1}, // Lower right
-        {-1,  -1}, // Upper left
+        {-1, -1}, // Upper left
         {-1, 1} // Lower left
 };
 
@@ -35,7 +35,7 @@ Environment *init_environment(int width, int height) {
     Environment *env = malloc(sizeof(Environment));
     assert(env != NULL);
 
-    env->grid = (bool*) malloc(sizeof(bool) * size);
+    env->grid = (bool *) malloc(sizeof(bool) * size);
     assert(env->grid != NULL);
     env->height = height;
     env->width = width;
@@ -61,7 +61,7 @@ void destroy_env(Environment *env) {
  * Prints the simulation grid as 1s and 0s.
  * @param env The environment to be printed.
  */
-void _debug_print_env(Environment *env) {
+void _debug_print_env(Environment const *env) {
     for (int x = 0; x < env->width; x++) {
         for (int y = 0; y < env->height; y++) {
             printf("%d", access(env, x, y));
@@ -77,7 +77,7 @@ void _debug_print_env(Environment *env) {
  * @param y The y coordinate of the desired cell
  * @return
  */
-bool access(Environment *env, int x, int y) {
+bool access(Environment const *env, int x, int y) {
     int i = ((env->width) * y) + x; // Calculate index
     return env->grid[i];
 }
@@ -123,7 +123,7 @@ Coordinate wrap(Environment *env, Coordinate coord) {
  * @param y The y coordinate of the current cell
  * @return The number of living neighbours around the current cell
  */
-int num_neighbours(Environment *env, int x, int y) {
+int num_neighbours(Environment const *env, int x, int y) {
 
     int neighbours = 0;
     for (int i = 0; i < 8; i++) {
@@ -150,7 +150,7 @@ int num_neighbours(Environment *env, int x, int y) {
  * @param y The y coordinate of the current cell
  * @return The next state of the cell (true for alive, false for dead)
  */
-bool next_state(Environment *env, int x, int y) {
+bool next_state(Environment const *env, int x, int y) {
     int neighbours = num_neighbours(env, x, y);
     bool cell_state = access(env, x, y);
 
@@ -167,13 +167,13 @@ bool next_state(Environment *env, int x, int y) {
             return false;
         }
 
-        // If it has 2-3 neighbours, it stays alive
+            // If it has 2-3 neighbours, it stays alive
         else {
             return true;
         }
     }
 
-    // If a cell is dead
+        // If a cell is dead
     else {
         // And it has exactly 3 neighbours, it becomes alive
         return neighbours == 3;
@@ -187,7 +187,7 @@ bool next_state(Environment *env, int x, int y) {
 void next_generation(Environment *env) {
 
     // Update the copy with all the new states
-    bool *copy = (bool*) malloc(sizeof(bool) * env->width * env->height);
+    bool *copy = (bool *) malloc(sizeof(bool) * env->width * env->height);
     for (int x = 0; x < env->width; x++) {
         for (int y = 0; y < env->height; y++) {
             copy[(env->width * y) + x] = next_state(env, x, y); // Write next state onto the copy
@@ -215,12 +215,44 @@ void place_seed(Environment *env, Seed *seed) {
  * @return a seed with space for the specified number of cells.
  */
 Seed *init_seed(int cells) {
-    Seed *seed = (Seed *) malloc(sizeof(Seed) + sizeof(Coordinate) * cells);
+    Seed *seed = (Seed *) malloc(sizeof(Seed) + cells * sizeof(Coordinate));
     assert(seed != NULL);
     seed->cells = cells;
     return seed;
 }
 
+/**
+ * Frees a seed from memory.
+ * @param seed The seed to be freed.
+ */
+void destroy_seed(Seed *seed) {
+    free(seed->points);
+    free(seed);
+}
+
+/**
+ * Translates the coordinate.
+ * @param coord The coordinate to be translated
+ * @param x The x amount to translate the coordinate by
+ * @param y The y amount to translate the coordinate by
+ * @return A new coordinate which is the translated version of the passed coordinate.
+ */
+Coordinate translate(Coordinate coord, int x, int y) {
+    return (Coordinate) {coord.x + x, coord.y + y};
+}
+
+/**
+ * Translates all coordinates in an array.
+ * @param coords The array of coordinates to be translated.
+ * @param len The length of the array
+ * @param x The x amount to translate all coordinates by
+ * @param y The y amount to translate all coordinates by
+ */
+void translate_coordinates(Coordinate *coords, int len, int x, int y) {
+    for (int i = 0; i < len; i++) {
+        coords[i] = translate(coords[i], x, y);
+    }
+}
 
 /**
  * Creates a shoebox seed at the origin.
@@ -231,17 +263,20 @@ Seed *init_seed(int cells) {
 Seed *ShoeBoxSeed(int x, int y) {
     Seed *seed = init_seed(9);
 
-    Coordinate points[9] = {
-            {-1 + x, -1 + y},
-            {0 + x,  -1 + y},
-            {1 + x,  -1 + y},
-            {2 + x,  -1 + y},
-            {-1 + x, 0 + y},
-            {2 + x,  0 + y},
-            {-1 + x, 1 + y},
-            {1 + x,  1 + y},
-            {2 + x,  1 + y}
+    Coordinate points[] = {
+            {-1, -1},
+            {0,  -1},
+            {1,  -1},
+            {2,  -1},
+            {-1, 0},
+            {2,  0},
+            {-1, 1},
+            {1,  1},
+            {2,  1}
     };
+
+    // Translate points and store in the seed
+    translate_coordinates(points, seed->cells, x, y);
     memcpy(seed->points, points, sizeof(points));
 
     return seed;
