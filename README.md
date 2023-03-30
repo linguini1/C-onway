@@ -18,8 +18,10 @@ No installation required, just run `conway.exe`.
 
 ## Development
 Development requires:
-- C compiler
-- SDL2 Library
+- A Windows operating system
+- MinGW compiler
+- SDL2 library
+- SDL_ttf library
 
 ### Coming features
 - Real-time analytics calculation
