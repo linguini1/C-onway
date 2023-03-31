@@ -164,14 +164,14 @@ Coordinate wrap(Environment const *env, Coordinate coord) {
  * @param y The y coordinate of the current cell
  * @return The number of living neighbours around the current cell
  */
-int num_neighbours(Environment const *env, int x, int y) {
+int num_neighbours(Environment const *env, unsigned int x, unsigned int y) {
 
     int neighbours = 0;
     for (int i = 0; i < 8; i++) {
 
         // Calculate position of current neighbour in each of the 8 surrounding cells
         Coordinate position = NEIGHBOURS[i];
-        Coordinate neighbour = {x + position.x, y + position.y};
+        Coordinate neighbour = {(int) x + position.x, (int) y + position.y};
 
         // If neighbour out of bounds, wrap around
         neighbour = wrap(env, neighbour);
@@ -191,7 +191,7 @@ int num_neighbours(Environment const *env, int x, int y) {
  * @param y The y coordinate of the current cell
  * @return The next state of the cell (true for alive, false for dead)
  */
-bool next_state(Environment const *env, int x, int y) {
+bool conway_next_state(Environment const *env, unsigned int x, unsigned int y) {
     int neighbours = num_neighbours(env, x, y);
     bool cell_state = access(env, x, y);
 
@@ -217,7 +217,7 @@ bool next_state(Environment const *env, int x, int y) {
  * Steps through one generation of the simulation, calculating the next one.
  * @param env The environment to update with the next generation
  */
-void next_generation(Environment *env) {
+void next_generation(Environment *env, StateCalculator next_state) {
 
     env->data.total_cells = 0; // Reset cell total
     env->data.generations++; // Increase generations

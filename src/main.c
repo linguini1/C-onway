@@ -11,13 +11,13 @@
 #include <SDL2/SDL_ttf.h>
 
 // Constants
-const short unsigned int SCALE = 5;
-const short unsigned int FONT_SCALE = 2;
+const float SCALE = 7;
+const float FONT_SCALE = 1.8f;
 const char WINDOW_NAME[] = "Conway's Game of Life Analyzer";
 
 // Simulation parameters
 Palette game_palette = MonitorGlow;
-const unsigned int DEFAULT_FRAME_DELAY = 200;
+const unsigned int DEFAULT_FRAME_DELAY = 100;
 const unsigned int MAX_FRAME_DELAY = 2000;
 const unsigned int FRAME_DELAY_STEP = 25;
 const int FONT_SIZE = 12;
@@ -54,8 +54,8 @@ int main(int argc, char **argv) {
     SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP); // Window will start fullscreen
     SDL_DisplayMode initial_display_mode;
     SDL_GetCurrentDisplayMode(0, &initial_display_mode); // Get the current window size
-    unsigned int game_width = initial_display_mode.w / SCALE;
-    unsigned int game_height = initial_display_mode.h / SCALE;
+    unsigned int game_width = initial_display_mode.w / (unsigned int) SCALE;
+    unsigned int game_height = initial_display_mode.h / (unsigned int) SCALE;
 
     // Create renderer
     SDL_Renderer *renderer = SDL_CreateRenderer(
@@ -66,7 +66,7 @@ int main(int argc, char **argv) {
 
     // Load font
     TTF_Font *font = TTF_OpenFont("../src/uni0553.ttf", FONT_SIZE); // TODO fix path
-    if (font == NULL){
+    if (font == NULL) {
         printf("Font could not be loaded.");
         return EXIT_FAILURE;
     }
@@ -121,16 +121,16 @@ int main(int argc, char **argv) {
                     analytics_on = !analytics_on;
                 }
                 // Clear simulation
-                if (key == SDLK_c){
+                if (key == SDLK_c) {
                     clear_env(environment);
                 }
             }
             // Mouse click or click and drag
             if (event.type == SDL_MOUSEBUTTONDOWN || (event.type == SDL_MOUSEMOTION && event.motion.state)) {
-                unsigned int x = event.motion.x / SCALE;
-                unsigned int y = event.motion.y / SCALE;
+                unsigned int x = event.motion.x / (unsigned int) SCALE;
+                unsigned int y = event.motion.y / (unsigned int) SCALE;
                 bool new_state = !access(environment, x, y);
-                if (new_state){
+                if (new_state) {
                     environment->data.initial_cells++; // These are not natural cells, so they should be registered
                 } else {
                     environment->data.initial_cells--; // A cell has been removed
@@ -140,7 +140,7 @@ int main(int argc, char **argv) {
         }
 
         // Clear screen
-        SDL_RenderSetScale(renderer, (float) SCALE, (float) SCALE); // Scale for cells
+        SDL_RenderSetScale(renderer, SCALE, SCALE); // Scale for cells
         set_draw_colour(renderer, &game_palette, !dark_mode); // Dead cell colour
         SDL_RenderClear(renderer);
         set_draw_colour(renderer, &game_palette, dark_mode); // Living cell colour
@@ -170,14 +170,14 @@ int main(int argc, char **argv) {
 
         // If analytics on, draw them
         if (analytics_on) {
-            SDL_RenderSetScale(renderer, (float) FONT_SCALE, (float) FONT_SCALE); // Text scale back to 1
+            SDL_RenderSetScale(renderer, FONT_SCALE, FONT_SCALE); // Text scale back to 1
             SDL_RenderCopy(renderer, analytics_texture, NULL, &analytics_rect);
         }
         SDL_DestroyTexture(analytics_texture);
 
         // Calculate the next generation if playing and enough time has passed since last generation
         if (playing && (SDL_GetTicks() - generation_timer) >= environment->data.generation_speed) {
-            next_generation(environment);
+            next_generation(environment, conway_next_state);
             generation_timer = SDL_GetTicks();
         }
 

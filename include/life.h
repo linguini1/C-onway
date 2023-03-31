@@ -33,6 +33,8 @@ typedef struct seed {
     Coordinate *points;
 } Seed;
 
+typedef bool (*StateCalculator)(Environment const *, unsigned int, unsigned int);
+
 // Function headers
 void populate_analytics_string(char **string, Environment const *env);
 
@@ -50,11 +52,11 @@ void write(Environment *env, unsigned int x, unsigned int y, bool value);
 
 Coordinate wrap(Environment const *env, Coordinate coord);
 
-int num_neighbours(Environment const *env, int x, int y);
+int num_neighbours(Environment const *env, unsigned int x, unsigned int y);
 
-bool next_state(Environment const *env, int x, int y);
+bool conway_next_state(Environment const *env, unsigned int x, unsigned int y);
 
-void next_generation(Environment *env);
+void next_generation(Environment *env, StateCalculator next_state);
 
 Seed *init_seed(unsigned int cells);
 
