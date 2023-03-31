@@ -30,7 +30,7 @@ typedef struct coord {
 
 typedef struct seed {
     unsigned int cells;
-    Coordinate points[];
+    Coordinate *points;
 } Seed;
 
 // Function headers
@@ -56,16 +56,16 @@ bool next_state(Environment const *env, int x, int y);
 
 void next_generation(Environment *env);
 
-Seed *init_seed(int cells);
+Seed *init_seed(unsigned int cells);
 
 void destroy_seed(Seed *seed);
 
 Coordinate translate(Coordinate coord, int x, int y);
 
-void translate_coordinates(Coordinate *coords, int len, int x, int y);
+void translate_coordinates(Coordinate *coords, unsigned int len, int x, int y);
 
-void place_seed(Environment *env, Seed *seed);
+void place_seed(Environment *env, Seed const *seed);
 
-Seed *ShoeBoxSeed(int x, int y);
+Seed *ShoeBoxSeed(unsigned int x, unsigned int y);
 
 #endif

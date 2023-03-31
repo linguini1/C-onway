@@ -8,7 +8,6 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <stdio.h>
-#include <string.h>
 
 // Constants
 const Coordinate NEIGHBOURS[8] = {
@@ -95,7 +94,7 @@ void clear_env(Environment *env) {
  * @param env the environment to be freed.
  */
 void destroy_env(Environment *env) {
-    free(&(env->grid));
+    free(env->grid);
     free(env);
 }
 
@@ -120,7 +119,7 @@ void _debug_print_env(Environment const *env) {
  * @return
  */
 bool access(Environment const *env, unsigned int x, unsigned int y) {
-    int i = ((env->width) * y) + x; // Calculate index
+    unsigned int i = ((env->width) * y) + x; // Calculate index
     return env->grid[i];
 }
 
@@ -132,7 +131,7 @@ bool access(Environment const *env, unsigned int x, unsigned int y) {
  * @param value The value to be written to the (x, y) location
  */
 void write(Environment *env, unsigned int x, unsigned int y, bool value) {
-    int i = ((env->width) * y) + x; // Calculate index
+    unsigned int i = ((env->width) * y) + x; // Calculate index
     env->grid[i] = value;
 }
 
@@ -144,16 +143,16 @@ void write(Environment *env, unsigned int x, unsigned int y, bool value) {
  */
 Coordinate wrap(Environment const *env, Coordinate coord) {
     if (coord.x < 0) {
-        coord.x += env->width;
+        coord.x += (int) env->width;
     }
     if (coord.x >= env->width) {
-        coord.x -= env->width;
+        coord.x -= (int) env->width;
     }
     if (coord.y < 0) {
-        coord.y += env->height;
+        coord.y += (int) env->height;
     }
     if (coord.y >= env->height) {
-        coord.y -= env->height;
+        coord.y -= (int) env->height;
     }
     return coord;
 }
@@ -245,7 +244,7 @@ void next_generation(Environment *env) {
  * @param env The environment containing the simulation grid
  * @param seed The seed to be placed in the simulation
  */
-void place_seed(Environment *env, Seed *seed) {
+void place_seed(Environment *env, Seed const *seed) {
     env->data.initial_cells = seed->cells; // Record initial cells
     for (int i = 0; i < seed->cells; i++) {
         Coordinate coord = seed->points[i];
@@ -258,10 +257,12 @@ void place_seed(Environment *env, Seed *seed) {
  * @param cells The number of cells the seed will have
  * @return a seed with space for the specified number of cells.
  */
-Seed *init_seed(int cells) {
-    Seed *seed = (Seed *) malloc(sizeof(Seed) + cells * sizeof(Coordinate));
+Seed *init_seed(unsigned int cells) {
+    Seed *seed = (Seed *) malloc(sizeof(Seed));
     assert(seed != NULL);
     seed->cells = cells;
+    seed->points = (Coordinate *) malloc(sizeof(Coordinate) * cells);
+    assert(seed->points != NULL);
     return seed;
 }
 
@@ -292,7 +293,7 @@ Coordinate translate(Coordinate coord, int x, int y) {
  * @param x The x amount to translate all coordinates by
  * @param y The y amount to translate all coordinates by
  */
-void translate_coordinates(Coordinate *coords, int len, int x, int y) {
+void translate_coordinates(Coordinate *coords, unsigned int len, int x, int y) {
     for (int i = 0; i < len; i++) {
         coords[i] = translate(coords[i], x, y);
     }
@@ -304,24 +305,21 @@ void translate_coordinates(Coordinate *coords, int len, int x, int y) {
  * @param y The y coordinate at which to place the seed
  * @return The shoebox seed
  */
-Seed *ShoeBoxSeed(int x, int y) {
+Seed *ShoeBoxSeed(unsigned int x, unsigned int y) {
     Seed *seed = init_seed(9);
 
-    Coordinate points[] = {
-            {-1, -1},
-            {0,  -1},
-            {1,  -1},
-            {2,  -1},
-            {-1, 0},
-            {2,  0},
-            {-1, 1},
-            {1,  1},
-            {2,  1}
-    };
+    seed->points[0] = (Coordinate) {-1, -1};
+    seed->points[1] = (Coordinate) {0, -1};
+    seed->points[2] = (Coordinate) {1, -1};
+    seed->points[3] = (Coordinate) {2, -1};
+    seed->points[4] = (Coordinate) {-1, 0};
+    seed->points[5] = (Coordinate) {2, 0};
+    seed->points[6] = (Coordinate) {-1, 1};
+    seed->points[7] = (Coordinate) {1, 1};
+    seed->points[8] = (Coordinate) {2, 1};
 
     // Translate points and store in the seed
-    translate_coordinates(points, seed->cells, x, y);
-    memcpy(seed->points, points, sizeof(points));
+    translate_coordinates(seed->points, seed->cells, (int) x, (int) y);
 
     return seed;
 }
