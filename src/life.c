@@ -23,7 +23,7 @@ const Coordinate NEIGHBOURS[8] = {
 
 /* SIMULATION ANALYTICS */
 
-void populate_analytics_string(char **string, Environment const *env) {
+void populate_analytics_string(char **string, Environment const *env, CellType *cell_type) {
 
     SimulationAnalytics data = env->data;
     float percent_alive = ((float) (data.total_cells) / (float) (env->width * env->height)) * 100.0f;
@@ -32,7 +32,8 @@ void populate_analytics_string(char **string, Environment const *env) {
 
     asprintf(
             string,
-            "generations: %llu\ninitial cells: %u\ncells: %lu\npercentage alive: %.3f%%\ngrowth: %.1f%%\ngeneration length: %ums",
+            "cell type: %s\ngenerations: %llu\ninitial cells: %u\ncells: %lu\npercentage alive: %.3f%%\ngrowth: %.1f%%\ngeneration length: %ums",
+            cell_type->name,
             data.generations,
             data.initial_cells,
             data.total_cells,
@@ -217,7 +218,7 @@ int num_neighbours(Environment const *env, unsigned int x, unsigned int y) {
  * Steps through one generation of the simulation, calculating the next one.
  * @param env The environment to update with the next generation
  */
-void next_generation(Environment *env, StateCalculator next_state) {
+void next_generation(Environment *env, CellType *cell_type) {
 
     env->data.total_cells = 0; // Reset cell total
     env->data.generations++; // Increase generations
@@ -226,7 +227,7 @@ void next_generation(Environment *env, StateCalculator next_state) {
     bool *copy = (bool *) malloc(sizeof(bool) * env->width * env->height);
     for (int x = 0; x < env->width; x++) {
         for (int y = 0; y < env->height; y++) {
-            bool state = next_state(env, x, y);
+            bool state = cell_type->calculator(env, x, y);
 
             // Increase cell total
             if (state) {
@@ -250,10 +251,10 @@ void next_generation(Environment *env, StateCalculator next_state) {
  */
 bool conway_next_state(Environment const *env, unsigned int x, unsigned int y) {
     int neighbours = num_neighbours(env, x, y);
-    bool cell_state = access(env, x, y);
+    bool alive = access(env, x, y);
 
     // If a cell is alive:
-    if (cell_state) {
+    if (alive) {
         if (neighbours <= 1 || neighbours >= 4) {
             // If 1 or fewer neighbours, it dies
             // If 4 or more neighbours, it dies
@@ -267,6 +268,23 @@ bool conway_next_state(Environment const *env, unsigned int x, unsigned int y) {
     else {
         // And it has exactly 3 neighbours, it becomes alive
         return neighbours == 3;
+    }
+}
+
+bool maze_next_state(Environment const *env, unsigned int x, unsigned int y){
+    bool alive = access(env, x, y);
+    int neighbours = num_neighbours(env, x, y);
+
+    // If already alive
+    if (alive){
+        if (2 <= neighbours && neighbours <= 5){
+            return true; // must have 2-5 neighbours to survive
+        }
+        return false;
+    }
+    // If dead
+    else{
+        return neighbours == 3; // Exactly 3 neighbours to live
     }
 }
 

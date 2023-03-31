@@ -36,10 +36,18 @@ typedef struct seed {
 // State calculation functions
 typedef bool (*StateCalculator)(Environment const *, unsigned int, unsigned int);
 
+typedef struct cell_type{
+    char *name;
+    StateCalculator calculator;
+} CellType;
+
+#define ConwayCell (CellType) {"conway cell", conway_next_state}
+#define MazeCell (CellType) {"maze cell", maze_next_state}
+
 /* FUNCTION HEADERS */
 
 /* SIMULATION ANALYTICS */
-void populate_analytics_string(char **string, Environment const *env);
+void populate_analytics_string(char **string, Environment const *env, CellType *cell_type);
 
 /* COORDINATE MANIPULATION */
 Coordinate translate(Coordinate coord, int x, int y);
@@ -63,10 +71,12 @@ void write(Environment *env, unsigned int x, unsigned int y, bool value);
 
 int num_neighbours(Environment const *env, unsigned int x, unsigned int y);
 
-void next_generation(Environment *env, StateCalculator next_state);
+void next_generation(Environment *env, CellType *cell_type);
 
 /* STATE CALCULATORS */
 bool conway_next_state(Environment const *env, unsigned int x, unsigned int y);
+
+bool maze_next_state(Environment const *env, unsigned int x, unsigned int y);
 
 /* SEEDS */
 Seed *init_seed(unsigned int cells);

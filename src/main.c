@@ -82,6 +82,7 @@ int main(int argc, char **argv) {
 
     // Simulation assets
     Environment *environment = init_environment(game_width, game_height, DEFAULT_FRAME_DELAY);
+    CellType cell_type = ConwayCell;
 
     while (running) {
 
@@ -92,6 +93,7 @@ int main(int argc, char **argv) {
             if (event.type == SDL_QUIT || (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)) {
                 running = false;
             }
+
             // Keypress events
             if (event.type == SDL_KEYDOWN) {
                 SDL_KeyCode key = event.key.keysym.sym;
@@ -101,7 +103,7 @@ int main(int argc, char **argv) {
                     playing = !playing;
                 }
                 // Speed controls
-                if (key == SDLK_DOWN && environment->data.generation_speed <= MAX_FRAME_DELAY - FRAME_DELAY_STEP) {
+                else if (key == SDLK_DOWN && environment->data.generation_speed <= MAX_FRAME_DELAY - FRAME_DELAY_STEP) {
                     environment->data.generation_speed += FRAME_DELAY_STEP; // Slow down
                 } else if (key == SDLK_UP && environment->data.generation_speed >= FRAME_DELAY_STEP) {
                     environment->data.generation_speed -= FRAME_DELAY_STEP; // Speed up
@@ -109,24 +111,24 @@ int main(int argc, char **argv) {
                     environment->data.generation_speed = 0;  // Max speed
                 }
                 // Switch theme (keys between 0-9)
-                if (0x30 <= key && key <= 0x39) {
+                else if (0x30 <= key && key <= 0x39) {
                     reset_palette(&game_palette, key);
                 }
                 // Toggle dark mode
-                if (key == SDLK_d) {
+                else if (key == SDLK_d) {
                     dark_mode = !dark_mode;
                 }
                 // Toggle analytics
-                if (key == SDLK_a) {
+                else if (key == SDLK_a) {
                     analytics_on = !analytics_on;
                 }
                 // Clear simulation
-                if (key == SDLK_c) {
+                else if (key == SDLK_c) {
                     clear_env(environment);
                 }
             }
             // Mouse click or click and drag
-            if (event.type == SDL_MOUSEBUTTONDOWN || (event.type == SDL_MOUSEMOTION && event.motion.state)) {
+            else if (event.type == SDL_MOUSEBUTTONDOWN || (event.type == SDL_MOUSEMOTION && event.motion.state)) {
                 unsigned int x = event.motion.x / (unsigned int) SCALE;
                 unsigned int y = event.motion.y / (unsigned int) SCALE;
                 bool new_state = !access(environment, x, y);
@@ -155,7 +157,7 @@ int main(int argc, char **argv) {
         }
 
         // Create analytics
-        populate_analytics_string(&analytics_string, environment); // Create analytics string
+        populate_analytics_string(&analytics_string, environment, &cell_type); // Create analytics string
         SDL_DisplayMode display_mode;
         SDL_GetCurrentDisplayMode(0, &display_mode); // Get current width and height for text wrapping
         SDL_Surface *analytics_surface = TTF_RenderText_Solid_Wrapped(
@@ -168,7 +170,7 @@ int main(int argc, char **argv) {
         SDL_Rect analytics_rect = {5, 0, analytics_surface->w, analytics_surface->h}; // Top left corner
         SDL_FreeSurface(analytics_surface); // No longer needed after being added to texture
 
-        // If analytics on, draw them
+        // If analytics are turned on, draw them
         if (analytics_on) {
             SDL_RenderSetScale(renderer, FONT_SCALE, FONT_SCALE); // Text scale back to 1
             SDL_RenderCopy(renderer, analytics_texture, NULL, &analytics_rect);
@@ -177,7 +179,7 @@ int main(int argc, char **argv) {
 
         // Calculate the next generation if playing and enough time has passed since last generation
         if (playing && (SDL_GetTicks() - generation_timer) >= environment->data.generation_speed) {
-            next_generation(environment, conway_next_state);
+            next_generation(environment, &cell_type);
             generation_timer = SDL_GetTicks();
         }
 
