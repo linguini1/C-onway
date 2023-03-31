@@ -18,7 +18,6 @@ const short unsigned int SCALE = 5;
 const unsigned int GAME_WIDTH = WIDTH / SCALE;
 const unsigned int GAME_HEIGHT = HEIGHT / SCALE;
 const char WINDOW_NAME[] = "Conway's Game of Life Analyzer";
-const Coordinate MAP_CENTER = {(int) GAME_WIDTH / 2, (int) GAME_HEIGHT / 2};
 
 // Simulation parameters
 Palette game_palette = MonitorGlow;
@@ -37,11 +36,13 @@ int main(int argc, char **argv) {
     // Start SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         printf("Could not initialize SDL: %s\n", SDL_GetError());
+        return EXIT_FAILURE;
     }
 
     // Start SDL_ttf
     if (TTF_Init() < 0) {
         printf("Could not initialize SDL_ttf: %s\n", TTF_GetError());
+        return EXIT_FAILURE;
     }
 
     // Create window
@@ -61,20 +62,27 @@ int main(int argc, char **argv) {
             SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC // Accelerated and in sync with monitor refresh rate
     );
 
+    // Load font
+    TTF_Font *font = TTF_OpenFont("../src/uni0553.ttf", FONT_SIZE); // TODO fix path
+    if (font == NULL){
+        printf("Font could not be loaded.");
+        return EXIT_FAILURE;
+    }
+
     // Runtime variables
     bool running = true; // For quitting the animation
     bool playing = false; // For play and pause
     bool dark_mode = true; // Simulation runs in dark mode
     bool analytics_on = true; // Shows analytics by default
-    TTF_Font *font = TTF_OpenFont("..\\src\\uni0553.ttf", FONT_SIZE); // Analytics font and size TODO fix path
-    SDL_Texture *analytics; // Texture for analytics text
-    SDL_Surface *analytics_text; // Surface for analytics text
+    char *analytics_string; // String for analytics text
     SDL_Event event; // For capturing events
 
     // Simulation assets
     Environment *environment = init_environment(GAME_WIDTH, GAME_HEIGHT, DEFAULT_FRAME_DELAY);
 
     while (running) {
+
+        // Handle events
         while (SDL_PollEvent(&event)) {
 
             // Quit program
@@ -97,7 +105,7 @@ int main(int argc, char **argv) {
                 } else if (key == SDLK_m) {
                     environment->data.frame_speed = 0;  // Max speed
                 }
-                // Switch theme
+                // Switch theme (keys between 0-9)
                 if (0x30 <= key && key <= 0x39) {
                     reset_palette(&game_palette, key);
                 }
@@ -143,22 +151,24 @@ int main(int argc, char **argv) {
             }
         }
 
-        // Draw analytics
-        char *analytics_string;
-        populate_analytics_string(&analytics_string, environment);
-
-        analytics_text = TTF_RenderText_Solid_Wrapped(
+        // Create analytics
+        populate_analytics_string(&analytics_string, environment); // Create analytics string
+        SDL_Surface *analytics_surface = TTF_RenderText_Solid_Wrapped(
                 font,
                 analytics_string,
                 dark_mode ? game_palette.light : game_palette.dark, // Switch colour with toggle
                 WIDTH  // Wrap on \n or when width is larger than window width
         );
-        analytics = SDL_CreateTextureFromSurface(renderer, analytics_text);
-        SDL_Rect analytics_rect = {5, 0, analytics_text->w, analytics_text->h}; // Top left corner
+        SDL_Texture *analytics_texture = SDL_CreateTextureFromSurface(renderer, analytics_surface);
+        SDL_Rect analytics_rect = {5, 0, analytics_surface->w, analytics_surface->h}; // Top left corner
+        SDL_FreeSurface(analytics_surface); // No longer needed after being added to texture
+
+        // If analytics on, draw them
         if (analytics_on) {
             SDL_RenderSetScale(renderer, 1.0f, 1.0f); // Text scale back to 1
-            SDL_RenderCopy(renderer, analytics, NULL, &analytics_rect);
+            SDL_RenderCopy(renderer, analytics_texture, NULL, &analytics_rect);
         }
+        SDL_DestroyTexture(analytics_texture);
 
         // Calculate the next generation
         if (playing) {
@@ -171,20 +181,17 @@ int main(int argc, char **argv) {
 
         // Clean up
         free(analytics_string);
-        SDL_DestroyTexture(analytics);
     }
-
-    // TODO figure out what's causing heap corruption
-    // Release resources
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_DestroyTexture(analytics);
-    free(font);
-    TTF_Quit();
-    SDL_Quit();
 
     // Release simulation assets
     destroy_env(environment);
+    TTF_CloseFont(font);
+
+    // Release resources
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    TTF_Quit();
+    SDL_Quit();
 
     return 0;
 }
