@@ -26,11 +26,13 @@ void populate_analytics_string(char **string, Environment const *env) {
 
     SimulationAnalytics data = env->data;
     float percent_alive = ((float) (data.total_cells) / (float) (env->width * env->height)) * 100.0f;
-    float growth = ((float) data.total_cells / (float) data.initial_cells) * 100.0f;
+    float initial_cells = data.initial_cells == 0 ? 1.0f : (float) data.initial_cells;
+    float growth = ((float) data.total_cells / initial_cells) * 100.0f;
 
     asprintf(
             string,
-            "initial cells: %u\ncells: %lu\npercentage alive: %.3f%%\ngrowth: %.1f%%",
+            "generations: %llu\ninitial cells: %u\ncells: %lu\npercentage alive: %.3f%%\ngrowth: %.1f%%",
+            data.generations,
             data.initial_cells,
             data.total_cells,
             percent_alive,
@@ -65,8 +67,25 @@ Environment *init_environment(int width, int height) {
     // Simulation data
     env->data.total_cells = 0;
     env->data.initial_cells = 0;
+    env->data.generations = 0;
 
     return env;
+}
+
+/**
+ * Clear all cells from the simulation grid.
+ * @param env The simulation environment to be cleared.
+ */
+void clear_env(Environment *env) {
+    unsigned int size = env->width * env->height;
+    for (unsigned int i = 0; i < size; i++) {
+        env->grid[i] = false;
+    }
+
+    // Reset totals
+    env->data.initial_cells = 0;
+    env->data.total_cells = 0;
+    env->data.generations = 0;
 }
 
 /**
@@ -75,7 +94,6 @@ Environment *init_environment(int width, int height) {
  */
 void destroy_env(Environment *env) {
     free(&(env->grid));
-    free(&(env->data));
     free(env);
 }
 
@@ -99,7 +117,7 @@ void _debug_print_env(Environment const *env) {
  * @param y The y coordinate of the desired cell
  * @return
  */
-bool access(Environment const *env, int x, int y) {
+bool access(Environment const *env, unsigned int x, unsigned int y) {
     int i = ((env->width) * y) + x; // Calculate index
     return env->grid[i];
 }
@@ -111,7 +129,7 @@ bool access(Environment const *env, int x, int y) {
  * @param y The y coordinate of the location to be modified
  * @param value The value to be written to the (x, y) location
  */
-void write(Environment *env, int x, int y, bool value) {
+void write(Environment *env, unsigned int x, unsigned int y, bool value) {
     int i = ((env->width) * y) + x; // Calculate index
     env->grid[i] = value;
 }
@@ -200,8 +218,8 @@ bool next_state(Environment const *env, int x, int y) {
  */
 void next_generation(Environment *env) {
 
-    // Reset cell total
-    env->data.total_cells = 0;
+    env->data.total_cells = 0; // Reset cell total
+    env->data.generations++; // Increase generations
 
     // Update the copy with all the new states
     bool *copy = (bool *) malloc(sizeof(bool) * env->width * env->height);

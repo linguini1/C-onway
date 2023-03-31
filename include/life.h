@@ -12,6 +12,7 @@
 typedef struct sim_data {
     long unsigned int total_cells;
     unsigned int initial_cells;
+    long long unsigned int generations;
 } SimulationAnalytics;
 
 typedef struct environment {
@@ -36,13 +37,15 @@ void populate_analytics_string(char **string, Environment const *env);
 
 Environment *init_environment(int width, int height);
 
+void clear_env(Environment *env);
+
 void destroy_env(Environment *env);
 
 void _debug_print_env(Environment const *env);
 
-bool access(Environment const *env, int x, int y);
+bool access(Environment const *env, unsigned int x, unsigned int y);
 
-void write(Environment *env, int x, int y, bool value);
+void write(Environment *env, unsigned int x, unsigned int y, bool value);
 
 Coordinate wrap(Environment const *env, Coordinate coord);
 

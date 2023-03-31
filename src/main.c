@@ -12,9 +12,9 @@
 #include <Windows.h>
 
 // Constants
-const int WIDTH = 700;
+const int WIDTH = 1200;
 const int HEIGHT = 700;
-const int SCALE = 4;
+const int SCALE = 5;
 const int GAME_WIDTH = WIDTH / SCALE;
 const int GAME_HEIGHT = HEIGHT / SCALE;
 const char WINDOW_NAME[] = "Conway's Game of Life Analyzer";
@@ -68,6 +68,8 @@ int main(int argc, char **argv) {
     bool analytics_on = true; // Shows analytics by default
     int frame_delay = DEFAULT_FRAME_DELAY; // Length of each frame
     TTF_Font *font = TTF_OpenFont("..\\src\\uni0553.ttf", FONT_SIZE); // Analytics font and size TODO fix path
+    SDL_Texture *analytics; // Texture for analytics text
+    SDL_Surface *analytics_text; // Surface for analytics text
     SDL_Event event; // For capturing events
 
     // Simulation assets
@@ -77,10 +79,11 @@ int main(int argc, char **argv) {
 
     while (running) {
         while (SDL_PollEvent(&event)) {
+
+            // Quit program
             if (event.type == SDL_QUIT) {
                 running = false;
             }
-
             // Keypress events
             if (event.type == SDL_KEYDOWN) {
                 SDL_KeyCode key = event.key.keysym.sym;
@@ -109,6 +112,17 @@ int main(int argc, char **argv) {
                 if (key == SDLK_a) {
                     analytics_on = !analytics_on;
                 }
+                // Clear simulation
+                if (key == SDLK_c){
+                    clear_env(environment);
+                }
+            }
+            // Mouse click or click and drag
+            if (event.type == SDL_MOUSEBUTTONDOWN || (event.type == SDL_MOUSEMOTION && event.motion.state)) {
+                unsigned int x = event.motion.x / SCALE;
+                unsigned int y = event.motion.y / SCALE;
+                environment->data.initial_cells++;  // These are not natural, so they should be registered
+                write(environment, x, y, !access(environment, x, y)); // Toggle cell state at click
             }
         }
 
@@ -128,20 +142,19 @@ int main(int argc, char **argv) {
         }
 
         // Draw analytics
+        char *analytics_string;
+        populate_analytics_string(&analytics_string, environment);
+
+        analytics_text = TTF_RenderText_Solid_Wrapped(
+                font,
+                analytics_string,
+                dark_mode ? game_palette.light : game_palette.dark, // Switch colour with toggle
+                WIDTH  // Wrap on \n or when width is larger than window width
+        );
+        analytics = SDL_CreateTextureFromSurface(renderer, analytics_text);
+        SDL_Rect analytics_rect = {5, 0, analytics_text->w, analytics_text->h}; // Top left corner
         if (analytics_on) {
             SDL_RenderSetScale(renderer, 1.0f, 1.0f); // Text scale back to 1
-
-            char *analytics_string;
-            populate_analytics_string(&analytics_string, environment);
-
-            SDL_Surface *analytics_text = TTF_RenderText_Solid_Wrapped(
-                    font,
-                    analytics_string,
-                    dark_mode ? game_palette.light : game_palette.dark, // Switch colour with toggle
-                    WIDTH  // Wrap on \n or when width is larger than window width
-            );
-            SDL_Texture *analytics = SDL_CreateTextureFromSurface(renderer, analytics_text);
-            SDL_Rect analytics_rect = {0, 0, analytics_text->w, analytics_text->h}; // Top left corner
             SDL_RenderCopy(renderer, analytics, NULL, &analytics_rect);
         }
 
@@ -153,11 +166,18 @@ int main(int argc, char **argv) {
         // Show what was drawn
         Sleep(frame_delay);
         SDL_RenderPresent(renderer);
+
+        // Clean up
+        free(analytics_string);
     }
 
     // Release resources
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
+    SDL_DestroyTexture(analytics);
+    free(analytics_text);
+    free(font);
+    TTF_Quit();
     SDL_Quit();
 
     // Release simulation assets
