@@ -25,7 +25,7 @@ Palette game_palette = MonitorGlow;
 const unsigned int DEFAULT_FRAME_DELAY = 200;
 const unsigned int MAX_FRAME_DELAY = 2000;
 const unsigned int FRAME_DELAY_STEP = 25;
-const int FONT_SIZE = 14;
+const int FONT_SIZE = 12;
 
 int main(int argc, char **argv) {
 
