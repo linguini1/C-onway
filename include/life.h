@@ -64,9 +64,11 @@ Environment *init_environment(unsigned int width, unsigned int height, unsigned 
 
 void destroy_env(Environment *env);
 
-void _debug_print_env(Environment const *env);
+void debug_print_environment(Environment const *env);
 
 void clear_env(Environment *env);
+
+bool in_bounds(Environment const *env, unsigned int x, unsigned int y);
 
 bool access(Environment const *env, unsigned int x, unsigned int y);
 

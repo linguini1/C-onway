@@ -138,7 +138,7 @@ void destroy_env(Environment *env) {
  * Prints the simulation grid as 1s and 0s.
  * @param env The environment to be printed.
  */
-void _debug_print_env(Environment const *env) {
+void debug_print_environment(Environment const *env) {
     for (int x = 0; x < env->width; x++) {
         for (int y = 0; y < env->height; y++) {
             printf("%d", access(env, x, y));
@@ -171,6 +171,7 @@ void clear_env(Environment *env) {
  * @return
  */
 bool access(Environment const *env, unsigned int x, unsigned int y) {
+    assert(in_bounds(env, x, y)); // Assert x, y in bounds
     unsigned int i = ((env->width) * y) + x; // Calculate index
     return env->grid[i];
 }
@@ -183,9 +184,26 @@ bool access(Environment const *env, unsigned int x, unsigned int y) {
  * @param value The value to be written to the (x, y) location
  */
 void write(Environment *env, unsigned int x, unsigned int y, bool value) {
+    assert(in_bounds(env, x, y)); // Assert x, y in bounds
     unsigned int i = ((env->width) * y) + x; // Calculate index
     env->grid[i] = value;
 }
+
+/**
+ * Checks if given (x, y) coordinates are within the bounds of the simulation
+ * @param env The environment which sets the simulation bounds
+ * @param x The x coordinate to be checked
+ * @param y The y coordinate to be checked
+ * @return true if (x, y) are within bounds, false otherwise
+ */
+bool in_bounds(Environment const *env, unsigned int x, unsigned int y){
+    unsigned int index = env->width * y + x;
+    if (index < env->width * env->height){
+        return true;
+    }
+    return false;
+}
+
 
 /**
  * Calculates the number of living neighbours surrounding the cell. Cells on the environment

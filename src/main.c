@@ -11,7 +11,7 @@
 #include <SDL2/SDL_ttf.h>
 
 // Constants
-const float SCALE = 10;
+const float SCALE = 3;
 const float FONT_SCALE = 1.8f;
 const char WINDOW_NAME[] = "Conway's Game of Life Analyzer";
 
@@ -41,19 +41,22 @@ int main(int argc, char **argv) {
         return EXIT_FAILURE;
     }
 
+    // Determine screen size
+    SDL_DisplayMode initial_display_mode;
+    SDL_GetCurrentDisplayMode(0, &initial_display_mode); // Get the current window size
+
     // Create window
     SDL_Window *window = SDL_CreateWindow(
             WINDOW_NAME,
             SDL_WINDOWPOS_UNDEFINED,
             SDL_WINDOWPOS_UNDEFINED,
-            500,
-            500,
+            initial_display_mode.w,
+            initial_display_mode.h,
             SDL_WINDOW_OPENGL
     );
     SDL_SetWindowResizable(window, true); // Window should be resizable
-    SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP); // Window will start fullscreen
-    SDL_DisplayMode initial_display_mode;
-    SDL_GetCurrentDisplayMode(0, &initial_display_mode); // Get the current window size
+
+    // Determine simulation size from window size
     unsigned int game_width = initial_display_mode.w / (unsigned int) SCALE;
     unsigned int game_height = initial_display_mode.h / (unsigned int) SCALE;
 
@@ -137,13 +140,17 @@ int main(int argc, char **argv) {
             if (event.type == SDL_MOUSEBUTTONDOWN || (event.type == SDL_MOUSEMOTION && event.motion.state)) {
                 unsigned int x = event.motion.x / (unsigned int) SCALE;
                 unsigned int y = event.motion.y / (unsigned int) SCALE;
-                bool new_state = !access(environment, x, y);
-                if (new_state) {
-                    environment->data.initial_cells++; // These are not natural cells, so they should be registered
-                } else {
-                    environment->data.initial_cells--; // A cell has been removed
+
+                // Coordinates must be within boundaries, otherwise the action will be ignored
+                if (in_bounds(environment, x, y)){
+                    bool new_state = !access(environment, x, y);
+                    if (new_state) {
+                        environment->data.initial_cells++; // These are not natural cells, so they should be registered
+                    } else {
+                        environment->data.initial_cells--; // A cell has been removed
+                    }
+                    write(environment, x, y, new_state); // Toggle cell state at click
                 }
-                write(environment, x, y, new_state); // Toggle cell state at click
             }
         }
 
