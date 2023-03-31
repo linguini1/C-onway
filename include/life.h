@@ -13,7 +13,7 @@ typedef struct sim_data {
     long unsigned int total_cells;
     unsigned int initial_cells;
     long long unsigned int generations;
-    unsigned int frame_speed;
+    unsigned int generation_speed;
 } SimulationAnalytics;
 
 typedef struct environment {
@@ -36,7 +36,7 @@ typedef struct seed {
 // Function headers
 void populate_analytics_string(char **string, Environment const *env);
 
-Environment *init_environment(unsigned int width, unsigned int height, unsigned int frame_speed);
+Environment *init_environment(unsigned int width, unsigned int height, unsigned int generation_speed);
 
 void clear_env(Environment *env);
 

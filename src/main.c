@@ -98,12 +98,12 @@ int main(int argc, char **argv) {
                     playing = !playing;
                 }
                 // Speed controls
-                if (key == SDLK_DOWN && environment->data.frame_speed <= MAX_FRAME_DELAY - FRAME_DELAY_STEP) {
-                    environment->data.frame_speed += FRAME_DELAY_STEP; // Slow down
-                } else if (key == SDLK_UP && environment->data.frame_speed >= FRAME_DELAY_STEP) {
-                    environment->data.frame_speed -= FRAME_DELAY_STEP; // Speed up
+                if (key == SDLK_DOWN && environment->data.generation_speed <= MAX_FRAME_DELAY - FRAME_DELAY_STEP) {
+                    environment->data.generation_speed += FRAME_DELAY_STEP; // Slow down
+                } else if (key == SDLK_UP && environment->data.generation_speed >= FRAME_DELAY_STEP) {
+                    environment->data.generation_speed -= FRAME_DELAY_STEP; // Speed up
                 } else if (key == SDLK_m) {
-                    environment->data.frame_speed = 0;  // Max speed
+                    environment->data.generation_speed = 0;  // Max speed
                 }
                 // Switch theme (keys between 0-9)
                 if (0x30 <= key && key <= 0x39) {
@@ -171,7 +171,7 @@ int main(int argc, char **argv) {
         SDL_DestroyTexture(analytics_texture);
 
         // Calculate the next generation if playing and enough time has passed since last generation
-        if (playing && (SDL_GetTicks() - generation_timer) >= environment->data.frame_speed) {
+        if (playing && (SDL_GetTicks() - generation_timer) >= environment->data.generation_speed) {
             next_generation(environment);
             generation_timer = SDL_GetTicks();
         }
