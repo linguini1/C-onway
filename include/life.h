@@ -44,6 +44,8 @@ typedef struct cell_type{
 
 #define ConwayCell {"conway cell", conway_next_state}
 #define MazeCell {"maze cell", maze_next_state}
+#define NoiseCell {"noise cell", noise_next_state}
+#define StableCell {"stable cell", stable_next_state}
 
 /* FUNCTION HEADERS */
 
@@ -70,7 +72,7 @@ bool access(Environment const *env, unsigned int x, unsigned int y);
 
 void write(Environment *env, unsigned int x, unsigned int y, bool value);
 
-int num_neighbours(Environment const *env, unsigned int x, unsigned int y);
+int num_neighbours(Environment const *env, unsigned int x, unsigned int y, unsigned int consider);
 
 void next_generation(Environment *env, CellType *cell_type);
 
@@ -78,6 +80,10 @@ void next_generation(Environment *env, CellType *cell_type);
 bool conway_next_state(Environment const *env, unsigned int x, unsigned int y);
 
 bool maze_next_state(Environment const *env, unsigned int x, unsigned int y);
+
+bool noise_next_state(Environment const *env, unsigned int x, unsigned int y);
+
+bool stable_next_state(Environment const *env, unsigned int x, unsigned int y);
 
 /* CELL TYPES */
 void change_cell_type(CellType *cell_type, SDL_KeyCode key);

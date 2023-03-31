@@ -194,10 +194,11 @@ void write(Environment *env, unsigned int x, unsigned int y, bool value) {
  * @param y The y coordinate of the current cell
  * @return The number of living neighbours around the current cell
  */
-int num_neighbours(Environment const *env, unsigned int x, unsigned int y) {
+int num_neighbours(Environment const *env, unsigned int x, unsigned int y, unsigned int consider) {
 
+    assert(0 < consider && consider <= 8);
     int neighbours = 0;
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < consider; i++) {
 
         // Calculate position of current neighbour in each of the 8 surrounding cells
         Coordinate position = NEIGHBOURS[i];
@@ -250,7 +251,7 @@ void next_generation(Environment *env, CellType *cell_type) {
  * @return The next state of the cell (true for alive, false for dead)
  */
 bool conway_next_state(Environment const *env, unsigned int x, unsigned int y) {
-    int neighbours = num_neighbours(env, x, y);
+    int neighbours = num_neighbours(env, x, y, 8);
     bool alive = access(env, x, y);
 
     // If a cell is alive:
@@ -278,20 +279,68 @@ bool conway_next_state(Environment const *env, unsigned int x, unsigned int y) {
  * @param y The y coordinate of the current cell
  * @return The next state of the cell (true for alive, false for dead)
  */
-bool maze_next_state(Environment const *env, unsigned int x, unsigned int y){
+bool maze_next_state(Environment const *env, unsigned int x, unsigned int y) {
     bool alive = access(env, x, y);
-    int neighbours = num_neighbours(env, x, y);
+    int neighbours = num_neighbours(env, x, y, 8);
 
     // If already alive
-    if (alive){
-        if (2 <= neighbours && neighbours <= 5){
+    if (alive) {
+        if (2 <= neighbours && neighbours <= 5) {
             return true; // must have 2-5 neighbours to survive
         }
         return false;
     }
-    // If dead
-    else{
+        // If dead
+    else {
         return neighbours == 3; // Exactly 3 neighbours to live
+    }
+}
+
+/**
+ * Calculates the next state for the cell at (x, y) based on the rules for Pixel cells
+ * @param env The environment that holds the simulation
+ * @param x The x coordinate of the current cell
+ * @param y The y coordinate of the current cell
+ * @return The next state of the cell (true for alive, false for dead)
+ */
+bool noise_next_state(Environment const *env, unsigned int x, unsigned int y) {
+    bool alive = access(env, x, y);
+    int neighbours = num_neighbours(env, x, y, 8);
+
+    // If already alive
+    if (alive) {
+        if (4 <= neighbours && neighbours <= 5) {
+            return true; // must have 4-5 neighbours to survive
+        }
+        return false;
+    }
+        // If dead
+    else {
+        return neighbours == 2; // Exactly 2 neighbours to live
+    }
+}
+
+/**
+ * Calculates the next state for the cell at (x, y) based on the rules for Stable cells
+ * @param env The environment that holds the simulation
+ * @param x The x coordinate of the current cell
+ * @param y The y coordinate of the current cell
+ * @return The next state of the cell (true for alive, false for dead)
+ */
+bool stable_next_state(Environment const *env, unsigned int x, unsigned int y) {
+    bool alive = access(env, x, y);
+    unsigned int neighbours = num_neighbours(env, x, y, 4);
+
+    // If already alive
+    if (alive) {
+        if (2 <= neighbours && neighbours <= 3) {
+            return true; // must have 2-3 neighbours to survive
+        }
+        return false;
+    }
+        // If dead
+    else {
+        return neighbours == 2; // Exactly 2 neighbours to live
     }
 }
 
@@ -304,6 +353,12 @@ void change_cell_type(CellType *cell_type, SDL_KeyCode key) {
     switch (key) {
         case SDLK_2:
             *cell_type = (CellType) MazeCell;
+            break;
+        case SDLK_3:
+            *cell_type = (CellType) NoiseCell;
+            break;
+        case SDLK_4:
+            *cell_type = (CellType) StableCell;
             break;
         default:
             *cell_type = (CellType) ConwayCell; // Also handles key 1

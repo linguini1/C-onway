@@ -1,7 +1,7 @@
 /**
  * Main file for running Conway's Game of Life simulation in real time with simulation analytics.
  * @author Matteo Golin
- * @version 1.0
+ * @version 1.1
  */
 #include "palettes.h"
 #include "life.h"
@@ -11,13 +11,12 @@
 #include <SDL2/SDL_ttf.h>
 
 // Constants
-const float SCALE = 7;
+const float SCALE = 10;
 const float FONT_SCALE = 1.8f;
 const char WINDOW_NAME[] = "Conway's Game of Life Analyzer";
 
 // Simulation parameters
 Palette const GAME_PALETTES[] = PALETTES;
-short unsigned int palette = 0;
 const unsigned int DEFAULT_FRAME_DELAY = 100;
 const unsigned int MAX_FRAME_DELAY = 2000;
 const unsigned int FRAME_DELAY_STEP = 25;
@@ -73,17 +72,18 @@ int main(int argc, char **argv) {
     }
 
     // Runtime variables
+    unsigned int generation_timer = SDL_GetTicks(); // Slow generations without slowing animation
     bool running = true; // For quitting the animation
     bool playing = false; // For play and pause
     bool dark_mode = true; // Simulation runs in dark mode
     bool analytics_on = true; // Shows analytics by default
-    char *analytics_string; // String for analytics text
     SDL_Event event; // For capturing events
-    unsigned int generation_timer = SDL_GetTicks(); // Slow generations without slowing animation
 
     // Simulation assets
     Environment *environment = init_environment(game_width, game_height, DEFAULT_FRAME_DELAY);
     CellType cell_type = ConwayCell;
+    char *analytics_string; // String for analytics text
+    short unsigned int palette = 0; // Controls game palette
 
     while (running) {
 
@@ -103,7 +103,7 @@ int main(int argc, char **argv) {
                 if (key == SDLK_SPACE) {
                     playing = !playing;
                 }
-                // Speed controls
+                    // Speed controls
                 else if (key == SDLK_DOWN && environment->data.generation_speed <= MAX_FRAME_DELAY - FRAME_DELAY_STEP) {
                     environment->data.generation_speed += FRAME_DELAY_STEP; // Slow down
                 } else if (key == SDLK_UP && environment->data.generation_speed >= FRAME_DELAY_STEP) {
@@ -111,29 +111,30 @@ int main(int argc, char **argv) {
                 } else if (key == SDLK_m) {
                     environment->data.generation_speed = 0;  // Max speed
                 }
-                // Switch cell types (keys between 0-9)
+                    // Switch cell types (keys between 0-9)
                 else if (0x30 <= key && key <= 0x39) {
                     change_cell_type(&cell_type, key);
                 }
-                // Toggle dark mode
+                    // Toggle dark mode
                 else if (key == SDLK_d) {
                     dark_mode = !dark_mode;
                 }
-                // Toggle analytics
+                    // Toggle analytics
                 else if (key == SDLK_a) {
                     analytics_on = !analytics_on;
                 }
-                // Clear simulation
+                    // Clear simulation
                 else if (key == SDLK_c) {
                     clear_env(environment);
                 }
-                // Cycle through themes
-                else if (key == SDLK_t){
+                    // Cycle through themes
+                else if (key == SDLK_t) {
                     palette = (palette + 1) % NUM_PALETTES;
                 }
             }
+
             // Mouse click or click and drag
-            else if (event.type == SDL_MOUSEBUTTONDOWN || (event.type == SDL_MOUSEMOTION && event.motion.state)) {
+            if (event.type == SDL_MOUSEBUTTONDOWN || (event.type == SDL_MOUSEMOTION && event.motion.state)) {
                 unsigned int x = event.motion.x / (unsigned int) SCALE;
                 unsigned int y = event.motion.y / (unsigned int) SCALE;
                 bool new_state = !access(environment, x, y);
@@ -171,8 +172,9 @@ int main(int argc, char **argv) {
                 dark_mode ? GAME_PALETTES[palette].light : GAME_PALETTES[palette].dark, // Switch colour with toggle
                 display_mode.w  // Wrap on \n or when width is larger than window width
         );
+        // Display text in top left corner
         SDL_Texture *analytics_texture = SDL_CreateTextureFromSurface(renderer, analytics_surface);
-        SDL_Rect analytics_rect = {5, 0, analytics_surface->w, analytics_surface->h}; // Top left corner
+        SDL_Rect analytics_rect = {5, 0, analytics_surface->w, analytics_surface->h};
         SDL_FreeSurface(analytics_surface); // No longer needed after being added to texture
 
         // If analytics are turned on, draw them
