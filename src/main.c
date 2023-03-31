@@ -120,8 +120,13 @@ int main(int argc, char **argv) {
             if (event.type == SDL_MOUSEBUTTONDOWN || (event.type == SDL_MOUSEMOTION && event.motion.state)) {
                 unsigned int x = event.motion.x / SCALE;
                 unsigned int y = event.motion.y / SCALE;
-                environment->data.initial_cells++;  // These are not natural, so they should be registered
-                write(environment, x, y, !access(environment, x, y)); // Toggle cell state at click
+                bool new_state = !access(environment, x, y);
+                if (new_state){
+                    environment->data.initial_cells++; // These are not natural cells, so they should be registered
+                } else {
+                    environment->data.initial_cells--; // A cell has been removed
+                }
+                write(environment, x, y, new_state); // Toggle cell state at click
             }
         }
 
@@ -175,7 +180,6 @@ int main(int argc, char **argv) {
     // Release resources
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
-    free(analytics_text);
     SDL_DestroyTexture(analytics);
     free(font);
     TTF_Quit();
