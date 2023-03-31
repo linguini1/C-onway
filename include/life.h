@@ -33,41 +33,49 @@ typedef struct seed {
     Coordinate *points;
 } Seed;
 
+// State calculation functions
 typedef bool (*StateCalculator)(Environment const *, unsigned int, unsigned int);
 
-// Function headers
+/* FUNCTION HEADERS */
+
+/* SIMULATION ANALYTICS */
 void populate_analytics_string(char **string, Environment const *env);
 
-Environment *init_environment(unsigned int width, unsigned int height, unsigned int generation_speed);
+/* COORDINATE MANIPULATION */
+Coordinate translate(Coordinate coord, int x, int y);
 
-void clear_env(Environment *env);
+void translate_coordinates(Coordinate *coords, unsigned int len, int x, int y);
+
+Coordinate wrap(Environment const *env, Coordinate coord);
+
+/* SIMULATION ENVIRONMENT */
+Environment *init_environment(unsigned int width, unsigned int height, unsigned int generation_speed);
 
 void destroy_env(Environment *env);
 
 void _debug_print_env(Environment const *env);
 
+void clear_env(Environment *env);
+
 bool access(Environment const *env, unsigned int x, unsigned int y);
 
 void write(Environment *env, unsigned int x, unsigned int y, bool value);
 
-Coordinate wrap(Environment const *env, Coordinate coord);
-
 int num_neighbours(Environment const *env, unsigned int x, unsigned int y);
-
-bool conway_next_state(Environment const *env, unsigned int x, unsigned int y);
 
 void next_generation(Environment *env, StateCalculator next_state);
 
+/* STATE CALCULATORS */
+bool conway_next_state(Environment const *env, unsigned int x, unsigned int y);
+
+/* SEEDS */
 Seed *init_seed(unsigned int cells);
 
 void destroy_seed(Seed *seed);
 
-Coordinate translate(Coordinate coord, int x, int y);
-
-void translate_coordinates(Coordinate *coords, unsigned int len, int x, int y);
-
 void place_seed(Environment *env, Seed const *seed);
 
+// Custom seeds
 Seed *ShoeBoxSeed(unsigned int x, unsigned int y);
 
 #endif

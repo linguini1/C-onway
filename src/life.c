@@ -9,7 +9,7 @@
 #include <assert.h>
 #include <stdio.h>
 
-// Constants
+/* CONSTANTS */
 const Coordinate NEIGHBOURS[8] = {
         {0,  -1}, // Up
         {0,  1}, // Down
@@ -20,6 +20,8 @@ const Coordinate NEIGHBOURS[8] = {
         {-1, -1}, // Upper left
         {-1, 1} // Lower left
 };
+
+/* SIMULATION ANALYTICS */
 
 void populate_analytics_string(char **string, Environment const *env) {
 
@@ -39,6 +41,55 @@ void populate_analytics_string(char **string, Environment const *env) {
             data.generation_speed
     );
 }
+
+/* COORDINATE MANIPULATION */
+
+/**
+ * Translates the coordinate.
+ * @param coord The coordinate to be translated
+ * @param x The x amount to translate the coordinate by
+ * @param y The y amount to translate the coordinate by
+ * @return A new coordinate which is the translated version of the passed coordinate.
+ */
+Coordinate translate(Coordinate coord, int x, int y) {
+    return (Coordinate) {coord.x + x, coord.y + y};
+}
+
+/**
+ * Translates all coordinates in an array.
+ * @param coords The array of coordinates to be translated.
+ * @param len The length of the array
+ * @param x The x amount to translate all coordinates by
+ * @param y The y amount to translate all coordinates by
+ */
+void translate_coordinates(Coordinate *coords, unsigned int len, int x, int y) {
+    for (int i = 0; i < len; i++) {
+        coords[i] = translate(coords[i], x, y);
+    }
+}
+
+/**
+ * If the coordinate is out of the environment boundaries, wrap it around to the opposite side.
+ * @param coord
+ * @return The wrapped coordinate
+ */
+Coordinate wrap(Environment const *env, Coordinate coord) {
+    if (coord.x < 0) {
+        coord.x += (int) env->width;
+    }
+    if (coord.x >= env->width) {
+        coord.x -= (int) env->width;
+    }
+    if (coord.y < 0) {
+        coord.y += (int) env->height;
+    }
+    if (coord.y >= env->height) {
+        coord.y -= (int) env->height;
+    }
+    return coord;
+}
+
+/* SIMULATION ENVIRONMENT */
 
 /**
  * Create the Environment (grid) for cell growth to occur in, starting with all dead cells.
@@ -74,22 +125,6 @@ Environment *init_environment(unsigned int width, unsigned int height, unsigned 
 }
 
 /**
- * Clear all cells from the simulation grid.
- * @param env The simulation environment to be cleared.
- */
-void clear_env(Environment *env) {
-    unsigned int size = env->width * env->height;
-    for (unsigned int i = 0; i < size; i++) {
-        env->grid[i] = false;
-    }
-
-    // Reset totals
-    env->data.initial_cells = 0;
-    env->data.total_cells = 0;
-    env->data.generations = 0;
-}
-
-/**
  * Destroys an Environment struct.
  * @param env the environment to be freed.
  */
@@ -109,6 +144,22 @@ void _debug_print_env(Environment const *env) {
         }
         printf("\n");
     }
+}
+
+/**
+ * Clear all cells from the simulation grid.
+ * @param env The simulation environment to be cleared.
+ */
+void clear_env(Environment *env) {
+    unsigned int size = env->width * env->height;
+    for (unsigned int i = 0; i < size; i++) {
+        env->grid[i] = false;
+    }
+
+    // Reset totals
+    env->data.initial_cells = 0;
+    env->data.total_cells = 0;
+    env->data.generations = 0;
 }
 
 /**
@@ -133,28 +184,6 @@ bool access(Environment const *env, unsigned int x, unsigned int y) {
 void write(Environment *env, unsigned int x, unsigned int y, bool value) {
     unsigned int i = ((env->width) * y) + x; // Calculate index
     env->grid[i] = value;
-}
-
-
-/**
- * If the coordinate is out of the environment boundaries, wrap it around to the opposite side.
- * @param coord
- * @return The wrapped coordinate
- */
-Coordinate wrap(Environment const *env, Coordinate coord) {
-    if (coord.x < 0) {
-        coord.x += (int) env->width;
-    }
-    if (coord.x >= env->width) {
-        coord.x -= (int) env->width;
-    }
-    if (coord.y < 0) {
-        coord.y += (int) env->height;
-    }
-    if (coord.y >= env->height) {
-        coord.y -= (int) env->height;
-    }
-    return coord;
 }
 
 /**
@@ -185,6 +214,34 @@ int num_neighbours(Environment const *env, unsigned int x, unsigned int y) {
 }
 
 /**
+ * Steps through one generation of the simulation, calculating the next one.
+ * @param env The environment to update with the next generation
+ */
+void next_generation(Environment *env, StateCalculator next_state) {
+
+    env->data.total_cells = 0; // Reset cell total
+    env->data.generations++; // Increase generations
+
+    // Update the copy with all the new states
+    bool *copy = (bool *) malloc(sizeof(bool) * env->width * env->height);
+    for (int x = 0; x < env->width; x++) {
+        for (int y = 0; y < env->height; y++) {
+            bool state = next_state(env, x, y);
+
+            // Increase cell total
+            if (state) {
+                env->data.total_cells++;
+            }
+            copy[(env->width * y) + x] = state; // Write next state onto the copy
+        }
+    }
+    free(env->grid);
+    env->grid = copy;
+}
+
+/* STATE CALCULATORS */
+
+/**
  * Calculates the next state for the cell at (x, y)
  * @param env The environment that holds the simulation
  * @param x The x coordinate of the current cell
@@ -213,44 +270,7 @@ bool conway_next_state(Environment const *env, unsigned int x, unsigned int y) {
     }
 }
 
-/**
- * Steps through one generation of the simulation, calculating the next one.
- * @param env The environment to update with the next generation
- */
-void next_generation(Environment *env, StateCalculator next_state) {
-
-    env->data.total_cells = 0; // Reset cell total
-    env->data.generations++; // Increase generations
-
-    // Update the copy with all the new states
-    bool *copy = (bool *) malloc(sizeof(bool) * env->width * env->height);
-    for (int x = 0; x < env->width; x++) {
-        for (int y = 0; y < env->height; y++) {
-            bool state = next_state(env, x, y);
-
-            // Increase cell total
-            if (state) {
-                env->data.total_cells++;
-            }
-            copy[(env->width * y) + x] = state; // Write next state onto the copy
-        }
-    }
-    free(env->grid);
-    env->grid = copy;
-}
-
-/**
- * Places a seed in the environment.
- * @param env The environment containing the simulation grid
- * @param seed The seed to be placed in the simulation
- */
-void place_seed(Environment *env, Seed const *seed) {
-    env->data.initial_cells = seed->cells; // Record initial cells
-    for (int i = 0; i < seed->cells; i++) {
-        Coordinate coord = seed->points[i];
-        write(env, coord.x, coord.y, true);
-    }
-}
+/* SEEDS */
 
 /**
  * Initializes a seed with space for the specified number of cells.
@@ -276,28 +296,19 @@ void destroy_seed(Seed *seed) {
 }
 
 /**
- * Translates the coordinate.
- * @param coord The coordinate to be translated
- * @param x The x amount to translate the coordinate by
- * @param y The y amount to translate the coordinate by
- * @return A new coordinate which is the translated version of the passed coordinate.
+ * Places a seed in the environment.
+ * @param env The environment containing the simulation grid
+ * @param seed The seed to be placed in the simulation
  */
-Coordinate translate(Coordinate coord, int x, int y) {
-    return (Coordinate) {coord.x + x, coord.y + y};
-}
-
-/**
- * Translates all coordinates in an array.
- * @param coords The array of coordinates to be translated.
- * @param len The length of the array
- * @param x The x amount to translate all coordinates by
- * @param y The y amount to translate all coordinates by
- */
-void translate_coordinates(Coordinate *coords, unsigned int len, int x, int y) {
-    for (int i = 0; i < len; i++) {
-        coords[i] = translate(coords[i], x, y);
+void place_seed(Environment *env, Seed const *seed) {
+    env->data.initial_cells = seed->cells; // Record initial cells
+    for (int i = 0; i < seed->cells; i++) {
+        Coordinate coord = seed->points[i];
+        write(env, coord.x, coord.y, true);
     }
 }
+
+// Custom seeds
 
 /**
  * Creates a shoebox seed at the origin.
