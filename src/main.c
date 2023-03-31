@@ -168,14 +168,15 @@ int main(int argc, char **argv) {
 
         // Clean up
         free(analytics_string);
+        SDL_DestroyTexture(analytics);
     }
 
     // TODO figure out what's causing heap corruption
     // Release resources
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
-    SDL_DestroyTexture(analytics);
     free(analytics_text);
+    SDL_DestroyTexture(analytics);
     free(font);
     TTF_Quit();
     SDL_Quit();
