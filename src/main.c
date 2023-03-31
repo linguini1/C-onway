@@ -75,6 +75,7 @@ int main(int argc, char **argv) {
     bool analytics_on = true; // Shows analytics by default
     char *analytics_string; // String for analytics text
     SDL_Event event; // For capturing events
+    unsigned int generation_timer = SDL_GetTicks(); // Slow generations without slowing animation
 
     // Simulation assets
     Environment *environment = init_environment(GAME_WIDTH, GAME_HEIGHT, DEFAULT_FRAME_DELAY);
@@ -169,13 +170,13 @@ int main(int argc, char **argv) {
         }
         SDL_DestroyTexture(analytics_texture);
 
-        // Calculate the next generation
-        if (playing) {
+        // Calculate the next generation if playing and enough time has passed since last generation
+        if (playing && (SDL_GetTicks() - generation_timer) >= environment->data.frame_speed) {
             next_generation(environment);
+            generation_timer = SDL_GetTicks();
         }
 
         // Show what was drawn
-        SDL_Delay(environment->data.frame_speed);
         SDL_RenderPresent(renderer);
 
         // Clean up
