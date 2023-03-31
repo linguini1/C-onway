@@ -41,8 +41,8 @@ typedef struct cell_type{
     StateCalculator calculator;
 } CellType;
 
-#define ConwayCell (CellType) {"conway cell", conway_next_state}
-#define MazeCell (CellType) {"maze cell", maze_next_state}
+#define ConwayCell {"conway cell", conway_next_state}
+#define MazeCell {"maze cell", maze_next_state}
 
 /* FUNCTION HEADERS */
 

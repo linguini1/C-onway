@@ -25,6 +25,8 @@ typedef struct palette {
 #define IronBlues {{228, 232, 209}, {89, 110, 121}}
 #define SpriteZero {{234, 230, 214}, {9, 121, 65}}
 #define Casio {{131, 176, 126}, {0, 0, 0}}
+#define PALETTES {MonitorGlow, Nokia3310, EndGame, PaperAndDust, IBM8503, OngBit, PaperBack, IronBlues, SpriteZero, Casio}
+#define NUM_PALETTES 10
 
 // Helper functions
 void set_draw_colour(SDL_Renderer *renderer, Palette const *palette, bool light);

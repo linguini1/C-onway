@@ -16,7 +16,8 @@ const float FONT_SCALE = 1.8f;
 const char WINDOW_NAME[] = "Conway's Game of Life Analyzer";
 
 // Simulation parameters
-Palette game_palette = MonitorGlow;
+Palette const GAME_PALETTES[] = PALETTES;
+short unsigned int palette = 0;
 const unsigned int DEFAULT_FRAME_DELAY = 100;
 const unsigned int MAX_FRAME_DELAY = 2000;
 const unsigned int FRAME_DELAY_STEP = 25;
@@ -112,7 +113,7 @@ int main(int argc, char **argv) {
                 }
                 // Switch theme (keys between 0-9)
                 else if (0x30 <= key && key <= 0x39) {
-                    reset_palette(&game_palette, key);
+                    // Do nothing
                 }
                 // Toggle dark mode
                 else if (key == SDLK_d) {
@@ -125,6 +126,10 @@ int main(int argc, char **argv) {
                 // Clear simulation
                 else if (key == SDLK_c) {
                     clear_env(environment);
+                }
+                // Cycle through themes
+                else if (key == SDLK_t){
+                    palette = (palette + 1) % NUM_PALETTES;
                 }
             }
             // Mouse click or click and drag
@@ -143,9 +148,9 @@ int main(int argc, char **argv) {
 
         // Clear screen
         SDL_RenderSetScale(renderer, SCALE, SCALE); // Scale for cells
-        set_draw_colour(renderer, &game_palette, !dark_mode); // Dead cell colour
+        set_draw_colour(renderer, &GAME_PALETTES[palette], !dark_mode); // Dead cell colour
         SDL_RenderClear(renderer);
-        set_draw_colour(renderer, &game_palette, dark_mode); // Living cell colour
+        set_draw_colour(renderer, &GAME_PALETTES[palette], dark_mode); // Living cell colour
 
         // Draw cells
         for (int x = 0; x < game_width; x++) {
@@ -163,7 +168,7 @@ int main(int argc, char **argv) {
         SDL_Surface *analytics_surface = TTF_RenderText_Solid_Wrapped(
                 font,
                 analytics_string,
-                dark_mode ? game_palette.light : game_palette.dark, // Switch colour with toggle
+                dark_mode ? GAME_PALETTES[palette].light : GAME_PALETTES[palette].dark, // Switch colour with toggle
                 display_mode.w  // Wrap on \n or when width is larger than window width
         );
         SDL_Texture *analytics_texture = SDL_CreateTextureFromSurface(renderer, analytics_surface);

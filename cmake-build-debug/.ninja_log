@@ -81,3 +81,7 @@
 3	137	7019903070429721	CMakeFiles/conway.dir/src/life.c.obj	8b645caa8f2ab071
 5	612	7019903549602211	CMakeFiles/conway.dir/src/main.c.obj	241aa737712f85b9
 613	727	7019903550701509	conway.exe	500a718ab1c4f51
+7	221	7019921738353054	CMakeFiles/conway.dir/src/life.c.obj	8b645caa8f2ab071
+25	729	7019921743428486	CMakeFiles/conway.dir/src/palettes.c.obj	da22198dac741d96
+17	757	7019921743713047	CMakeFiles/conway.dir/src/main.c.obj	241aa737712f85b9
+758	983	7019921745923131	conway.exe	500a718ab1c4f51
