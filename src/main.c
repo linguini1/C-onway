@@ -9,7 +9,6 @@
 #include <stdbool.h>
 #include <SDL.h>
 #include <SDL2/SDL_ttf.h>
-#include <Windows.h>
 
 // Constants
 const int WIDTH = 1200;
@@ -176,7 +175,7 @@ int main(int argc, char **argv) {
         }
 
         // Show what was drawn
-        Sleep(environment->data.frame_speed);
+        SDL_Delay(environment->data.frame_speed);
         SDL_RenderPresent(renderer);
 
         // Clean up
