@@ -63,7 +63,7 @@ int main(int argc, char **argv) {
 
     // Runtime variables
     bool running = true; // For quitting the animation
-    bool playing = true; // For play and pause
+    bool playing = false; // For play and pause
     bool dark_mode = true; // Simulation runs in dark mode
     bool analytics_on = true; // Shows analytics by default
     TTF_Font *font = TTF_OpenFont("..\\src\\uni0553.ttf", FONT_SIZE); // Analytics font and size TODO fix path
@@ -73,8 +73,6 @@ int main(int argc, char **argv) {
 
     // Simulation assets
     Environment *environment = init_environment(GAME_WIDTH, GAME_HEIGHT, DEFAULT_FRAME_DELAY);
-    Seed *seed = ShoeBoxSeed(MAP_CENTER.x, MAP_CENTER.y);
-    place_seed(environment, seed);
 
     while (running) {
         while (SDL_PollEvent(&event)) {
@@ -187,7 +185,6 @@ int main(int argc, char **argv) {
 
     // Release simulation assets
     destroy_env(environment);
-    destroy_seed(seed);
 
     return 0;
 }
