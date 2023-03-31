@@ -14,17 +14,17 @@
 // Constants
 const int WIDTH = 1200;
 const int HEIGHT = 700;
-const int SCALE = 5;
-const int GAME_WIDTH = WIDTH / SCALE;
-const int GAME_HEIGHT = HEIGHT / SCALE;
+const short unsigned int SCALE = 5;
+const unsigned int GAME_WIDTH = WIDTH / SCALE;
+const unsigned int GAME_HEIGHT = HEIGHT / SCALE;
 const char WINDOW_NAME[] = "Conway's Game of Life Analyzer";
-const Coordinate MAP_CENTER = {GAME_WIDTH / 2, GAME_HEIGHT / 2};
+const Coordinate MAP_CENTER = {(int) GAME_WIDTH / 2, (int) GAME_HEIGHT / 2};
 
 // Simulation parameters
 Palette game_palette = MonitorGlow;
-const int DEFAULT_FRAME_DELAY = 200;
-const int MAX_FRAME_DELAY = 1000;
-const int FRAME_DELAY_STEP = 25;
+const unsigned int DEFAULT_FRAME_DELAY = 200;
+const unsigned int MAX_FRAME_DELAY = 2000;
+const unsigned int FRAME_DELAY_STEP = 25;
 const int FONT_SIZE = 14;
 
 int main(int argc, char **argv) {
@@ -66,14 +66,13 @@ int main(int argc, char **argv) {
     bool playing = true; // For play and pause
     bool dark_mode = true; // Simulation runs in dark mode
     bool analytics_on = true; // Shows analytics by default
-    int frame_delay = DEFAULT_FRAME_DELAY; // Length of each frame
     TTF_Font *font = TTF_OpenFont("..\\src\\uni0553.ttf", FONT_SIZE); // Analytics font and size TODO fix path
     SDL_Texture *analytics; // Texture for analytics text
     SDL_Surface *analytics_text; // Surface for analytics text
     SDL_Event event; // For capturing events
 
     // Simulation assets
-    Environment *environment = init_environment(GAME_WIDTH, GAME_HEIGHT);
+    Environment *environment = init_environment(GAME_WIDTH, GAME_HEIGHT, DEFAULT_FRAME_DELAY);
     Seed *seed = ShoeBoxSeed(MAP_CENTER.x, MAP_CENTER.y);
     place_seed(environment, seed);
 
@@ -93,12 +92,12 @@ int main(int argc, char **argv) {
                     playing = !playing;
                 }
                 // Speed controls
-                if (key == SDLK_DOWN && frame_delay <= MAX_FRAME_DELAY - FRAME_DELAY_STEP) {
-                    frame_delay += FRAME_DELAY_STEP; // Slow down
-                } else if (key == SDLK_UP && frame_delay >= FRAME_DELAY_STEP) {
-                    frame_delay -= FRAME_DELAY_STEP; // Speed up
+                if (key == SDLK_DOWN && environment->data.frame_speed <= MAX_FRAME_DELAY - FRAME_DELAY_STEP) {
+                    environment->data.frame_speed += FRAME_DELAY_STEP; // Slow down
+                } else if (key == SDLK_UP && environment->data.frame_speed >= FRAME_DELAY_STEP) {
+                    environment->data.frame_speed -= FRAME_DELAY_STEP; // Speed up
                 } else if (key == SDLK_m) {
-                    frame_delay = 0;  // Max speed
+                    environment->data.frame_speed = 0;  // Max speed
                 }
                 // Switch theme
                 if (0x30 <= key && key <= 0x39) {
@@ -164,13 +163,14 @@ int main(int argc, char **argv) {
         }
 
         // Show what was drawn
-        Sleep(frame_delay);
+        Sleep(environment->data.frame_speed);
         SDL_RenderPresent(renderer);
 
         // Clean up
         free(analytics_string);
     }
 
+    // TODO figure out what's causing heap corruption
     // Release resources
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);

@@ -31,12 +31,13 @@ void populate_analytics_string(char **string, Environment const *env) {
 
     asprintf(
             string,
-            "generations: %llu\ninitial cells: %u\ncells: %lu\npercentage alive: %.3f%%\ngrowth: %.1f%%",
+            "generations: %llu\ninitial cells: %u\ncells: %lu\npercentage alive: %.3f%%\ngrowth: %.1f%%\nframe duration: %ums",
             data.generations,
             data.initial_cells,
             data.total_cells,
             percent_alive,
-            growth
+            growth,
+            data.frame_speed
     );
 }
 
@@ -46,9 +47,9 @@ void populate_analytics_string(char **string, Environment const *env) {
  * @param height The height of the environment
  * @return a flattened 2D array of booleans representing the environment
  */
-Environment *init_environment(int width, int height) {
+Environment *init_environment(unsigned int width, unsigned int height, unsigned int frame_speed) {
 
-    int size = width * height;
+    unsigned int size = width * height;
 
     // Create environment
     Environment *env = (Environment *) malloc(sizeof(Environment));
@@ -68,6 +69,7 @@ Environment *init_environment(int width, int height) {
     env->data.total_cells = 0;
     env->data.initial_cells = 0;
     env->data.generations = 0;
+    env->data.frame_speed = frame_speed;
 
     return env;
 }
