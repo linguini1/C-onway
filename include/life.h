@@ -7,6 +7,7 @@
 #define CONWAY_LIFE_H
 
 #include <stdbool.h>
+#include <SDL.h>
 
 // Custom types
 typedef struct sim_data {
@@ -77,6 +78,9 @@ void next_generation(Environment *env, CellType *cell_type);
 bool conway_next_state(Environment const *env, unsigned int x, unsigned int y);
 
 bool maze_next_state(Environment const *env, unsigned int x, unsigned int y);
+
+/* CELL TYPES */
+void change_cell_type(CellType *cell_type, SDL_KeyCode key);
 
 /* SEEDS */
 Seed *init_seed(unsigned int cells);

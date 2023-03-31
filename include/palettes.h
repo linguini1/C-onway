@@ -31,6 +31,5 @@ typedef struct palette {
 // Helper functions
 void set_draw_colour(SDL_Renderer *renderer, Palette const *palette, bool light);
 
-void reset_palette(Palette *palette, SDL_KeyCode key);
 
 #endif

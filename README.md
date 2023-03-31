@@ -15,7 +15,8 @@ No installation required, just run `conway.exe`.
 - Press `esc` to quit.
 - Increase or decrease the simulation speed using the up & down arrow keys.
   - Toggle max speed with the `m` key.
-- Select themes using the number keys `0-9`.
+- Switch cell types using the number keys.
+- Cycle through themes using the `t` key.
 - Toggle dark mode with the `d` key.
 - Toggle live analytics with the `a` key.
 

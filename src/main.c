@@ -111,9 +111,9 @@ int main(int argc, char **argv) {
                 } else if (key == SDLK_m) {
                     environment->data.generation_speed = 0;  // Max speed
                 }
-                // Switch theme (keys between 0-9)
+                // Switch cell types (keys between 0-9)
                 else if (0x30 <= key && key <= 0x39) {
-                    // Do nothing
+                    change_cell_type(&cell_type, key);
                 }
                 // Toggle dark mode
                 else if (key == SDLK_d) {

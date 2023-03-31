@@ -243,7 +243,7 @@ void next_generation(Environment *env, CellType *cell_type) {
 /* STATE CALCULATORS */
 
 /**
- * Calculates the next state for the cell at (x, y)
+ * Calculates the next state for the cell at (x, y) based on Conway's original Game of Life rules
  * @param env The environment that holds the simulation
  * @param x The x coordinate of the current cell
  * @param y The y coordinate of the current cell
@@ -271,6 +271,13 @@ bool conway_next_state(Environment const *env, unsigned int x, unsigned int y) {
     }
 }
 
+/**
+ * Calculates the next state for the cell at (x, y) based on the rules for Maze cells
+ * @param env The environment that holds the simulation
+ * @param x The x coordinate of the current cell
+ * @param y The y coordinate of the current cell
+ * @return The next state of the cell (true for alive, false for dead)
+ */
 bool maze_next_state(Environment const *env, unsigned int x, unsigned int y){
     bool alive = access(env, x, y);
     int neighbours = num_neighbours(env, x, y);
@@ -287,6 +294,23 @@ bool maze_next_state(Environment const *env, unsigned int x, unsigned int y){
         return neighbours == 3; // Exactly 3 neighbours to live
     }
 }
+
+/* CELL TYPES */
+/**
+ * Resets the cell type to the specified cell type.
+ * @param cell_type A pointer to the current cell type variable being used by the game
+ */
+void change_cell_type(CellType *cell_type, SDL_KeyCode key) {
+    switch (key) {
+        case SDLK_2:
+            *cell_type = (CellType) MazeCell;
+            break;
+        default:
+            *cell_type = (CellType) ConwayCell; // Also handles key 1
+            break;
+    }
+}
+
 
 /* SEEDS */
 
