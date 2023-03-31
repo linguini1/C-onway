@@ -11,11 +11,8 @@
 #include <SDL2/SDL_ttf.h>
 
 // Constants
-const int WIDTH = 1200;
-const int HEIGHT = 700;
 const short unsigned int SCALE = 5;
-const unsigned int GAME_WIDTH = WIDTH / SCALE;
-const unsigned int GAME_HEIGHT = HEIGHT / SCALE;
+const short unsigned int FONT_SCALE = 2;
 const char WINDOW_NAME[] = "Conway's Game of Life Analyzer";
 
 // Simulation parameters
@@ -49,10 +46,16 @@ int main(int argc, char **argv) {
             WINDOW_NAME,
             SDL_WINDOWPOS_UNDEFINED,
             SDL_WINDOWPOS_UNDEFINED,
-            WIDTH,
-            HEIGHT,
+            500,
+            500,
             SDL_WINDOW_OPENGL
     );
+    SDL_SetWindowResizable(window, true); // Window should be resizable
+    SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP); // Window will start fullscreen
+    SDL_DisplayMode initial_display_mode;
+    SDL_GetCurrentDisplayMode(0, &initial_display_mode); // Get the current window size
+    unsigned int game_width = initial_display_mode.w / SCALE;
+    unsigned int game_height = initial_display_mode.h / SCALE;
 
     // Create renderer
     SDL_Renderer *renderer = SDL_CreateRenderer(
@@ -78,15 +81,15 @@ int main(int argc, char **argv) {
     unsigned int generation_timer = SDL_GetTicks(); // Slow generations without slowing animation
 
     // Simulation assets
-    Environment *environment = init_environment(GAME_WIDTH, GAME_HEIGHT, DEFAULT_FRAME_DELAY);
+    Environment *environment = init_environment(game_width, game_height, DEFAULT_FRAME_DELAY);
 
     while (running) {
 
         // Handle events
         while (SDL_PollEvent(&event)) {
 
-            // Quit program
-            if (event.type == SDL_QUIT) {
+            // Quit program (esc)
+            if (event.type == SDL_QUIT || (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)) {
                 running = false;
             }
             // Keypress events
@@ -143,8 +146,8 @@ int main(int argc, char **argv) {
         set_draw_colour(renderer, &game_palette, dark_mode); // Living cell colour
 
         // Draw cells
-        for (int x = 0; x < GAME_WIDTH; x++) {
-            for (int y = 0; y < GAME_HEIGHT; y++) {
+        for (int x = 0; x < game_width; x++) {
+            for (int y = 0; y < game_height; y++) {
                 if (access(environment, x, y) == true) {
                     SDL_RenderDrawPoint(renderer, x, y);
                 }
@@ -153,11 +156,13 @@ int main(int argc, char **argv) {
 
         // Create analytics
         populate_analytics_string(&analytics_string, environment); // Create analytics string
+        SDL_DisplayMode display_mode;
+        SDL_GetCurrentDisplayMode(0, &display_mode); // Get current width and height for text wrapping
         SDL_Surface *analytics_surface = TTF_RenderText_Solid_Wrapped(
                 font,
                 analytics_string,
                 dark_mode ? game_palette.light : game_palette.dark, // Switch colour with toggle
-                WIDTH  // Wrap on \n or when width is larger than window width
+                display_mode.w  // Wrap on \n or when width is larger than window width
         );
         SDL_Texture *analytics_texture = SDL_CreateTextureFromSurface(renderer, analytics_surface);
         SDL_Rect analytics_rect = {5, 0, analytics_surface->w, analytics_surface->h}; // Top left corner
@@ -165,7 +170,7 @@ int main(int argc, char **argv) {
 
         // If analytics on, draw them
         if (analytics_on) {
-            SDL_RenderSetScale(renderer, 1.0f, 1.0f); // Text scale back to 1
+            SDL_RenderSetScale(renderer, (float) FONT_SCALE, (float) FONT_SCALE); // Text scale back to 1
             SDL_RenderCopy(renderer, analytics_texture, NULL, &analytics_rect);
         }
         SDL_DestroyTexture(analytics_texture);

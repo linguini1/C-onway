@@ -30,7 +30,7 @@ void populate_analytics_string(char **string, Environment const *env) {
 
     asprintf(
             string,
-            "generations: %llu\ninitial cells: %u\ncells: %lu\npercentage alive: %.3f%%\ngrowth: %.1f%%\ngeneratoin length: %ums",
+            "generations: %llu\ninitial cells: %u\ncells: %lu\npercentage alive: %.3f%%\ngrowth: %.1f%%\ngeneration length: %ums",
             data.generations,
             data.initial_cells,
             data.total_cells,
