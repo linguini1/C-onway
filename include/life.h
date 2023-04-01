@@ -37,7 +37,7 @@ typedef struct seed {
 // State calculation functions
 typedef bool (*StateCalculator)(Environment const *, unsigned int, unsigned int);
 
-typedef struct cell_type{
+typedef struct cell_type {
     char *name;
     StateCalculator calculator;
 } CellType;
@@ -69,11 +69,14 @@ void debug_print_environment(Environment const *env);
 
 void clear_env(Environment *env);
 
-bool in_bounds(Environment const *env, unsigned int x, unsigned int y);
 
 bool access(Environment const *env, unsigned int x, unsigned int y);
 
 void write(Environment *env, unsigned int x, unsigned int y, bool value);
+
+bool in_bounds(Environment const *env, unsigned int x, unsigned int y);
+
+bool *neighbours(Environment const *env, unsigned int x, unsigned int y);
 
 int num_neighbours(Environment const *env, unsigned int x, unsigned int y, unsigned int consider);
 

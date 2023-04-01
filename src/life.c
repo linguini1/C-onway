@@ -205,6 +205,31 @@ bool in_bounds(Environment const *env, unsigned int x, unsigned int y){
 }
 
 /**
+ * Returns an array of 8 booleans representing the state of each of a cells 8 neighbours (in order of the NEIGHBOURS
+ * constant)
+ * @param env The environment where the cell lives
+ * @param x The x coordinate of the cell being examined
+ * @param y The y coordinate of the cell being examined
+ * @return An array of 8 booleans corresponding to the cell's 8 neighbours' states
+ */
+bool *neighbours(Environment const *env, unsigned int x, unsigned int y){
+
+    // Create the array to hold neighbour states
+    bool *neighbour_states = malloc(sizeof(bool) * 8);
+
+    for (unsigned int i = 0; i < 8; i++){
+        // Calculate position of current neighbour in each of the 8 surrounding cells
+        Coordinate position = NEIGHBOURS[i];
+        Coordinate neighbour = {(int) x + position.x, (int) y + position.y};
+        neighbour = wrap(env, neighbour);  // If neighbour out of bounds, wrap around
+
+        // Store states
+        neighbour_states[i] = access(env, neighbour.x, neighbour.y);
+    }
+    return neighbour_states;
+}
+
+/**
  * Calculates the number of living neighbours surrounding the cell. Cells on the environment
  * border will look past the borders as though wrapping to the other side..
  * @param x The x coordinate of the current cell
@@ -213,23 +238,19 @@ bool in_bounds(Environment const *env, unsigned int x, unsigned int y){
  */
 int num_neighbours(Environment const *env, unsigned int x, unsigned int y, unsigned int consider) {
 
-    assert(0 < consider && consider <= 8);
-    int neighbours = 0;
+    assert(0 < consider && consider <= 8); // Can only consider max 8 neighbours and minimum 1
+
+    int neighbour_count = 0;
+    bool *neighbour_states = neighbours(env, x, y); // Get neighbour states
+
     for (int i = 0; i < consider; i++) {
-
-        // Calculate position of current neighbour in each of the 8 surrounding cells
-        Coordinate position = NEIGHBOURS[i];
-        Coordinate neighbour = {(int) x + position.x, (int) y + position.y};
-
-        // If neighbour out of bounds, wrap around
-        neighbour = wrap(env, neighbour);
-
         // Check if alive to increment total
-        if (access(env, neighbour.x, neighbour.y)) {
-            neighbours++;
+        if (neighbour_states[i]) {
+            neighbour_count++;
         }
     }
-    return neighbours;
+    free(neighbour_states); // No longer used
+    return neighbour_count;
 }
 
 /**
