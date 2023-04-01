@@ -11,7 +11,7 @@
 #include <SDL2/SDL_ttf.h>
 
 // Constants
-const float SCALE = 3;
+const float DEFAULT_SCALE = 5;
 const float FONT_SCALE = 1.8f;
 const char WINDOW_NAME[] = "Conway's Game of Life Analyzer";
 
@@ -57,8 +57,8 @@ int main(int argc, char **argv) {
     SDL_SetWindowResizable(window, true); // Window should be resizable
 
     // Determine simulation size from window size
-    unsigned int game_width = initial_display_mode.w / (unsigned int) SCALE;
-    unsigned int game_height = initial_display_mode.h / (unsigned int) SCALE;
+    unsigned int game_width = initial_display_mode.w / (unsigned int) DEFAULT_SCALE;
+    unsigned int game_height = initial_display_mode.h / (unsigned int) DEFAULT_SCALE;
 
     // Create renderer
     SDL_Renderer *renderer = SDL_CreateRenderer(
@@ -138,8 +138,8 @@ int main(int argc, char **argv) {
 
             // Mouse click or click and drag
             if (event.type == SDL_MOUSEBUTTONDOWN || (event.type == SDL_MOUSEMOTION && event.motion.state)) {
-                unsigned int x = event.motion.x / (unsigned int) SCALE;
-                unsigned int y = event.motion.y / (unsigned int) SCALE;
+                unsigned int x = event.motion.x / (unsigned int) DEFAULT_SCALE;
+                unsigned int y = event.motion.y / (unsigned int) DEFAULT_SCALE;
 
                 // Coordinates must be within boundaries, otherwise the action will be ignored
                 if (in_bounds(environment, x, y)){
@@ -155,7 +155,7 @@ int main(int argc, char **argv) {
         }
 
         // Clear screen
-        SDL_RenderSetScale(renderer, SCALE, SCALE); // Scale for cells
+        SDL_RenderSetScale(renderer, DEFAULT_SCALE, DEFAULT_SCALE); // Scale for cells
         set_draw_colour(renderer, &GAME_PALETTES[palette], !dark_mode); // Dead cell colour
         SDL_RenderClear(renderer);
         set_draw_colour(renderer, &GAME_PALETTES[palette], dark_mode); // Living cell colour

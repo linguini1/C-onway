@@ -46,6 +46,7 @@ typedef struct cell_type{
 #define MazeCell {"maze cell", maze_next_state}
 #define NoiseCell {"noise cell", noise_next_state}
 #define StableCell {"stable cell", stable_next_state}
+#define BridgeCell {"bridge cell", bridge_next_state};
 
 /* FUNCTION HEADERS */
 
@@ -86,6 +87,8 @@ bool maze_next_state(Environment const *env, unsigned int x, unsigned int y);
 bool noise_next_state(Environment const *env, unsigned int x, unsigned int y);
 
 bool stable_next_state(Environment const *env, unsigned int x, unsigned int y);
+
+bool bridge_next_state(Environment const *env, unsigned int x, unsigned int y);
 
 /* CELL TYPES */
 void change_cell_type(CellType *cell_type, SDL_KeyCode key);

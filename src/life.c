@@ -204,7 +204,6 @@ bool in_bounds(Environment const *env, unsigned int x, unsigned int y){
     return false;
 }
 
-
 /**
  * Calculates the number of living neighbours surrounding the cell. Cells on the environment
  * border will look past the borders as though wrapping to the other side..
@@ -362,6 +361,34 @@ bool stable_next_state(Environment const *env, unsigned int x, unsigned int y) {
     }
 }
 
+/**
+ * Calculates the next state for the cell at (x, y) based on Bridge cell rules
+ * @param env The environment that holds the simulation
+ * @param x The x coordinate of the current cell
+ * @param y The y coordinate of the current cell
+ * @return The next state of the cell (true for alive, false for dead)
+ */
+bool bridge_next_state(Environment const *env, unsigned int x, unsigned int y) {
+    int neighbours = num_neighbours(env, x, y, 6);
+    bool alive = access(env, x, y);
+
+    // If a cell is alive:
+    if (alive) {
+        if (neighbours >= 4) {
+            // If 4 or more neighbours, it dies
+            return false;
+        } else {
+            return true;  // If it has less than 4 neighbours, it stays alive
+        }
+    }
+
+        // If a cell is dead
+    else {
+        // And it has exactly 3 neighbours, it becomes alive
+        return neighbours == 3;
+    }
+}
+
 /* CELL TYPES */
 /**
  * Resets the cell type to the specified cell type.
@@ -377,6 +404,9 @@ void change_cell_type(CellType *cell_type, SDL_KeyCode key) {
             break;
         case SDLK_4:
             *cell_type = (CellType) StableCell;
+            break;
+        case SDLK_5:
+            *cell_type = (CellType) BridgeCell;
             break;
         default:
             *cell_type = (CellType) ConwayCell; // Also handles key 1
