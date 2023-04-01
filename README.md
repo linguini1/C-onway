@@ -13,7 +13,7 @@ No installation required, just run `conway.exe`.
 - Click to place cells.
 - Press `c` to clear.
 - Press `esc` to quit.
-- Increase or decrease the simulation speed using the up & down arrow keys.
+- Increase or decrease the simulation speed using the `+`/`-` keys.
   - Toggle max speed with the `m` key.
 - Switch cell types using the number keys.
 - Cycle through themes using the `t` key.

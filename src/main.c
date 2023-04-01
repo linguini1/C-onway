@@ -107,9 +107,11 @@ int main(int argc, char **argv) {
                     playing = !playing;
                 }
                     // Speed controls
-                else if (key == SDLK_DOWN && environment->data.generation_speed <= MAX_FRAME_DELAY - FRAME_DELAY_STEP) {
+                else if ((key == SDLK_MINUS || key == SDLK_KP_MINUS) &&
+                         environment->data.generation_speed <= MAX_FRAME_DELAY - FRAME_DELAY_STEP) {
                     environment->data.generation_speed += FRAME_DELAY_STEP; // Slow down
-                } else if (key == SDLK_UP && environment->data.generation_speed >= FRAME_DELAY_STEP) {
+                } else if ((key == SDLK_PLUS || key == SDLK_EQUALS || key == SDLK_KP_PLUS) &&
+                           environment->data.generation_speed >= FRAME_DELAY_STEP) {
                     environment->data.generation_speed -= FRAME_DELAY_STEP; // Speed up
                 } else if (key == SDLK_m) {
                     environment->data.generation_speed = 0;  // Max speed
@@ -142,7 +144,7 @@ int main(int argc, char **argv) {
                 unsigned int y = event.motion.y / (unsigned int) DEFAULT_SCALE;
 
                 // Coordinates must be within boundaries, otherwise the action will be ignored
-                if (in_bounds(environment, x, y)){
+                if (in_bounds(environment, x, y)) {
                     bool new_state = !access(environment, x, y);
                     if (new_state) {
                         environment->data.initial_cells++; // These are not natural cells, so they should be registered
