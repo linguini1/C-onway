@@ -86,6 +86,7 @@ int main(int argc, char **argv) {
     bool playing = false; // For play and pause
     bool dark_mode = true; // Simulation runs in dark mode
     bool analytics_on = true; // Shows analytics by default
+    bool selected_state = false; // For drawing a cohesive line on drag
     SDL_Event event; // For capturing events
 
     // Simulation assets
@@ -107,6 +108,8 @@ int main(int argc, char **argv) {
             // Keypress events
             if (event.type == SDL_KEYDOWN) {
                 SDL_KeyCode key = event.key.keysym.sym;
+                unsigned int current_width = initial_display_mode.w / (DEFAULT_SCALE + zoom);
+                unsigned int current_height = initial_display_mode.h / (DEFAULT_SCALE + zoom);
 
                 // Pause & play
                 if (key == SDLK_SPACE) {
@@ -142,33 +145,37 @@ int main(int argc, char **argv) {
                 else if (key == SDLK_t) {
                     palette = (palette + 1) % NUM_PALETTES;
                 }
-
-                // Arrow keys to move camera
-                else if (key == SDLK_LEFT){
-                    x_offset += MOVEMENT_STEP;
-                } else if (key == SDLK_RIGHT){
-                    x_offset -= MOVEMENT_STEP;
-                } else if (key == SDLK_UP){
-                    y_offset += MOVEMENT_STEP;
-                } else if (key == SDLK_DOWN){
-                    y_offset -= MOVEMENT_STEP;
-                }
             }
 
             // Mouse click or click and drag
-            if (event.type == SDL_MOUSEBUTTONDOWN || (event.type == SDL_MOUSEMOTION && event.motion.state)) {
+            if (event.type == SDL_MOUSEBUTTONDOWN) {
                 unsigned int x = event.motion.x / (unsigned int) (DEFAULT_SCALE + zoom) - x_offset;
                 unsigned int y = event.motion.y / (unsigned int) (DEFAULT_SCALE + zoom) - y_offset;
 
                 // Coordinates must be within boundaries, otherwise the action will be ignored
                 if (in_bounds(environment, x, y)) {
-                    bool new_state = !access(environment, x, y);
-                    if (new_state) {
+                    selected_state = !access(environment, x, y);
+                    if (selected_state) {
                         environment->data.initial_cells++; // These are not natural cells, so they should be registered
                     } else {
                         environment->data.initial_cells--; // A cell has been removed
                     }
-                    write(environment, x, y, new_state); // Toggle cell state at click
+                    write(environment, x, y, selected_state); // Toggle cell state at click
+                }
+            }
+
+            if (event.type == SDL_MOUSEMOTION && event.motion.state){
+                unsigned int x = event.motion.x / (unsigned int) (DEFAULT_SCALE + zoom) - x_offset;
+                unsigned int y = event.motion.y / (unsigned int) (DEFAULT_SCALE + zoom) - y_offset;
+
+                // Coordinates must be within boundaries, otherwise the action will be ignored
+                if (in_bounds(environment, x, y)) {
+                    if (selected_state) {
+                        environment->data.initial_cells++; // These are not natural cells, so they should be registered
+                    } else {
+                        environment->data.initial_cells--; // A cell has been removed
+                    }
+                    write(environment, x, y, selected_state); // Toggle cell state at click
                 }
             }
 
