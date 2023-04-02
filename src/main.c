@@ -11,7 +11,7 @@
 #include <SDL2/SDL_ttf.h>
 
 // Constants
-const float DEFAULT_SCALE = 5;
+const float DEFAULT_SCALE = 3;
 const float FONT_SCALE = 1.8f;
 const char WINDOW_NAME[] = "Conway's Game of Life Analyzer";
 
