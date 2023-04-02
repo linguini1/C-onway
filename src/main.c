@@ -11,7 +11,10 @@
 #include <SDL2/SDL_ttf.h>
 
 // Constants
-const float DEFAULT_SCALE = 3;
+const unsigned int DEFAULT_SCALE = 3;
+const unsigned int MAX_SCALE = 14;
+const unsigned int ZOOM_STEP = 1;
+const int MOVEMENT_STEP = 5;
 const float FONT_SCALE = 1.8f;
 const char WINDOW_NAME[] = "Conway's Game of Life Analyzer";
 
@@ -20,7 +23,7 @@ Palette const GAME_PALETTES[] = PALETTES;
 const unsigned int DEFAULT_FRAME_DELAY = 100;
 const unsigned int MAX_FRAME_DELAY = 2000;
 const unsigned int FRAME_DELAY_STEP = 25;
-const int FONT_SIZE = 12;
+const unsigned int FONT_SIZE = 12;
 
 int main(int argc, char **argv) {
 
@@ -59,6 +62,9 @@ int main(int argc, char **argv) {
     // Determine simulation size from window size
     unsigned int game_width = initial_display_mode.w / (unsigned int) DEFAULT_SCALE;
     unsigned int game_height = initial_display_mode.h / (unsigned int) DEFAULT_SCALE;
+    unsigned int zoom = 0; // No zoom by default
+    int x_offset = 0;
+    int y_offset = 0;
 
     // Create renderer
     SDL_Renderer *renderer = SDL_CreateRenderer(
@@ -68,7 +74,7 @@ int main(int argc, char **argv) {
     );
 
     // Load font
-    TTF_Font *font = TTF_OpenFont("../src/uni0553.ttf", FONT_SIZE); // TODO fix path
+    TTF_Font *font = TTF_OpenFont("../src/uni0553.ttf", (int) FONT_SIZE); // TODO fix path
     if (font == NULL) {
         printf("Font could not be loaded.");
         return EXIT_FAILURE;
@@ -136,12 +142,23 @@ int main(int argc, char **argv) {
                 else if (key == SDLK_t) {
                     palette = (palette + 1) % NUM_PALETTES;
                 }
+
+                // Arrow keys to move camera
+                else if (key == SDLK_LEFT){
+                    x_offset += MOVEMENT_STEP;
+                } else if (key == SDLK_RIGHT){
+                    x_offset -= MOVEMENT_STEP;
+                } else if (key == SDLK_UP){
+                    y_offset += MOVEMENT_STEP;
+                } else if (key == SDLK_DOWN){
+                    y_offset -= MOVEMENT_STEP;
+                }
             }
 
             // Mouse click or click and drag
             if (event.type == SDL_MOUSEBUTTONDOWN || (event.type == SDL_MOUSEMOTION && event.motion.state)) {
-                unsigned int x = event.motion.x / (unsigned int) DEFAULT_SCALE;
-                unsigned int y = event.motion.y / (unsigned int) DEFAULT_SCALE;
+                unsigned int x = event.motion.x / (unsigned int) (DEFAULT_SCALE + zoom) - x_offset;
+                unsigned int y = event.motion.y / (unsigned int) (DEFAULT_SCALE + zoom) - y_offset;
 
                 // Coordinates must be within boundaries, otherwise the action will be ignored
                 if (in_bounds(environment, x, y)) {
@@ -154,10 +171,19 @@ int main(int argc, char **argv) {
                     write(environment, x, y, new_state); // Toggle cell state at click
                 }
             }
+
+            // Scroll to zoom
+            if (event.type == SDL_MOUSEWHEEL) {
+                if (event.wheel.y > 0 && DEFAULT_SCALE + zoom + ZOOM_STEP <= MAX_SCALE) {
+                    zoom += ZOOM_STEP;
+                } else if (event.wheel.y < 0 && DEFAULT_SCALE + zoom - ZOOM_STEP >= DEFAULT_SCALE) {
+                    zoom -= ZOOM_STEP;
+                }
+            }
         }
 
         // Clear screen
-        SDL_RenderSetScale(renderer, DEFAULT_SCALE, DEFAULT_SCALE); // Scale for cells
+        SDL_RenderSetScale(renderer, (float) (DEFAULT_SCALE + zoom), (float) (DEFAULT_SCALE + zoom)); // Scale for cells
         set_draw_colour(renderer, &GAME_PALETTES[palette], !dark_mode); // Dead cell colour
         SDL_RenderClear(renderer);
         set_draw_colour(renderer, &GAME_PALETTES[palette], dark_mode); // Living cell colour
@@ -166,7 +192,7 @@ int main(int argc, char **argv) {
         for (int x = 0; x < game_width; x++) {
             for (int y = 0; y < game_height; y++) {
                 if (access(environment, x, y) == true) {
-                    SDL_RenderDrawPoint(renderer, x, y);
+                    SDL_RenderDrawPoint(renderer, x + x_offset, y + y_offset); // Allows arrow key movement
                 }
             }
         }
