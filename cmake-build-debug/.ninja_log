@@ -1,11 +1,6 @@
 # ninja log v5
-14	613	7020669681167640	CMakeFiles/conway.dir/src/life.c.obj	8b645caa8f2ab071
-5	521	7020671518352116	CMakeFiles/conway.dir/src/main.c.obj	241aa737712f85b9
-521	677	7020671519853840	conway.exe	500a718ab1c4f51
-14	717	7019925814322494	CMakeFiles/conway.dir/src/palettes.c.obj	da22198dac741d96
-1	153	7021756219853287	build.ninja	e75c4fa141e6263
-2	372	7021756219853287	build.ninja	e75c4fa141e6263
-4	463	7021756225266652	CMakeFiles/conway.dir/src/palettes.c.obj	da22198dac741d96
-8	505	7021756225701863	CMakeFiles/conway.dir/src/main.c.obj	241aa737712f85b9
 0	535	7021756225936874	CMakeFiles/conway.dir/src/life.c.obj	8b645caa8f2ab071
+8	505	7021756225701863	CMakeFiles/conway.dir/src/main.c.obj	241aa737712f85b9
 536	765	7021756228242742	conway.exe	500a718ab1c4f51
+4	463	7021756225266652	CMakeFiles/conway.dir/src/palettes.c.obj	da22198dac741d96
+2	372	7021766984749810	build.ninja	e75c4fa141e6263

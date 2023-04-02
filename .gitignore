@@ -1,7 +1,4 @@
 /.idea
 
 # External libraries
-/cmake-build-debug/*.dll
-/cmake-build-debug/*.lib
-/cmake-build-debug/*.a
-/cmake-build-debug/*.la
+/cmake-build-debug/

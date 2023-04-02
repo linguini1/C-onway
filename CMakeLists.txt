@@ -4,7 +4,6 @@ project(conway C)
 set(CMAKE_C_STANDARD 99)
 
 # SDL2
-find_package(SDL2 REQUIRED)
 set(CMAKE_PREFIX_PATH C:\\MinGW\\include\\SDL2)
 set(SDL2_INCLUDE_DIR C:\\MinGW\\include\\SDL2\\include)
 set(SDL2_LIB_DIR C:\\MinGW\\include\\SDL2\\lib\\x64)
