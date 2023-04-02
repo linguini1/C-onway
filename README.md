@@ -32,5 +32,9 @@ SDL_ttf can be installed [here](https://github.com/libsdl-org/SDL_ttf/releases).
 for 64bit (mingw.tar.gz).
 SDL2 can be installed [here](https://wiki.libsdl.org/SDL2/Installation).
 
+Place the following files in `/cmake-build-debug`:
+- `SDL2.dll`
+- `SDL2_ttf.dll`
+
 ### Coming features
 - Analytics CSV file
