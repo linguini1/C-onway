@@ -11,7 +11,7 @@
 #include <SDL2/SDL_ttf.h>
 
 // Constants
-const unsigned int DEFAULT_SCALE = 3;
+const unsigned int DEFAULT_SCALE = 6;
 const unsigned int MAX_SCALE = 14;
 const unsigned int ZOOM_STEP = 1;
 const int MOVEMENT_STEP = 5;
@@ -157,14 +157,14 @@ int main(int argc, char **argv) {
                     selected_state = !access(environment, x, y);
                     if (selected_state) {
                         environment->data.initial_cells++; // These are not natural cells, so they should be registered
-                    } else {
+                    } else if (environment->data.initial_cells - 1 > 0) {
                         environment->data.initial_cells--; // A cell has been removed
                     }
                     write(environment, x, y, selected_state); // Toggle cell state at click
                 }
             }
 
-            if (event.type == SDL_MOUSEMOTION && event.motion.state){
+            if (event.type == SDL_MOUSEMOTION && event.motion.state) {
                 unsigned int x = event.motion.x / (unsigned int) (DEFAULT_SCALE + zoom) - x_offset;
                 unsigned int y = event.motion.y / (unsigned int) (DEFAULT_SCALE + zoom) - y_offset;
 
@@ -172,7 +172,7 @@ int main(int argc, char **argv) {
                 if (in_bounds(environment, x, y)) {
                     if (selected_state) {
                         environment->data.initial_cells++; // These are not natural cells, so they should be registered
-                    } else {
+                    } else if (environment->data.initial_cells - 1 > 0) {
                         environment->data.initial_cells--; // A cell has been removed
                     }
                     write(environment, x, y, selected_state); // Toggle cell state at click
