@@ -26,13 +26,13 @@ No installation required, just run `conway.exe`.
 Development requires:
 - A Windows operating system
 - MinGW compiler
-- SDL2 library
-- SDL_ttf library
+- SDL2 library (2.0)
+- SDL_ttf library (2.20.2)
 
 ### Installing libraries
+SDL2 can be installed [here](https://wiki.libsdl.org/SDL2/Installation).
 SDL_ttf can be installed [here](https://github.com/libsdl-org/SDL_ttf/releases). Use the Windows development version 
 for 64bit (mingw.tar.gz).
-SDL2 can be installed [here](https://wiki.libsdl.org/SDL2/Installation).
 
 Place the following files in `/cmake-build-debug`:
 - `SDL2.dll`
