@@ -80,7 +80,7 @@ bool in_bounds(Environment const *env, unsigned int x, unsigned int y);
 
 bool *neighbours(Environment const *env, unsigned int x, unsigned int y, unsigned int consider);
 
-int num_neighbours(Environment const *env, unsigned int x, unsigned int y, unsigned int consider);
+unsigned int num_neighbours(Environment const *env, unsigned int x, unsigned int y, unsigned int consider);
 
 void next_generation(Environment *env, CellType *cell_type);
 
