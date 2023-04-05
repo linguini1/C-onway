@@ -313,22 +313,22 @@ void next_generation(Environment *env, CellType *cell_type) {
 void change_cell_type(CellType *cell_type, SDL_KeyCode key) {
     switch (key) {
         case SDLK_2:
-            *cell_type = (CellType) MazeCell;
-            break;
-        case SDLK_3:
-            *cell_type = (CellType) NoiseCell;
-            break;
-        case SDLK_4:
-            *cell_type = (CellType) FractalCell;
-            break;
-        case SDLK_5:
-            *cell_type = (CellType) TripleMooreConwayCell;
-            break;
-        case SDLK_6:
             *cell_type = (CellType) VonNeumannR2ConwayCell;
             break;
+        case SDLK_3:
+            *cell_type = (CellType) TripleMooreConwayCell;
+            break;
+        case SDLK_4:
+            *cell_type = (CellType) MazeCell;
+            break;
+        case SDLK_5:
+            *cell_type = (CellType) FractalCornerCell;
+            break;
+        case SDLK_6:
+            *cell_type = (CellType) FractalCell;
+            break;
         case SDLK_7:
-            *cell_type = (CellType) OrganicMazeCell;
+            *cell_type = (CellType) NoiseCell;
             break;
         default:
             *cell_type = (CellType) ConwayCell; // Also handles key 1
