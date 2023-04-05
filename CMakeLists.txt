@@ -23,5 +23,5 @@ set(SOURCE_FILES ./src/*.c)
 include_directories(.\\include)
 file(GLOB SRC_DIR "src/*.c")
 
-add_executable(conway ${SRC_DIR})
+add_executable(conway ${SRC_DIR} ./src/main.c)
 target_link_libraries(${PROJECT_NAME} SDL2main SDL2 SDL2_ttf)

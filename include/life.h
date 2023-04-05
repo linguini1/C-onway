@@ -7,23 +7,9 @@
 #define CONWAY_LIFE_H
 
 #include "neighbourhoods.h"
+#include "environment.h"
 #include <stdbool.h>
 #include <SDL.h>
-
-// Custom types
-typedef struct sim_data {
-    long unsigned int total_cells;
-    unsigned int initial_cells;
-    long long unsigned int generations;
-    unsigned int generation_speed;
-} SimulationAnalytics;
-
-typedef struct environment {
-    unsigned int width;
-    unsigned int height;
-    SimulationAnalytics data;
-    bool *grid;
-} Environment;
 
 /* NEIGHBOURHOODS */
 #define VonNeumann {0,-1}, {0,1}, {1,0}, {-1,0}
@@ -59,17 +45,6 @@ void populate_analytics_string(char **string, Environment const *env, CellType *
 Coordinate wrap(Environment const *env, Coordinate coord);
 
 /* SIMULATION ENVIRONMENT */
-Environment *init_environment(unsigned int width, unsigned int height, unsigned int generation_speed);
-
-void destroy_env(Environment *env);
-
-void clear_env(Environment *env);
-
-bool access(Environment const *env, unsigned int x, unsigned int y);
-
-void write(Environment *env, unsigned int x, unsigned int y, bool value);
-
-bool in_bounds(Environment const *env, unsigned int x, unsigned int y);
 
 bool *neighbours(Environment const *env, unsigned int x, unsigned int y, Neighbourhood const *neighbourhood);
 
