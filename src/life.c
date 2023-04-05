@@ -109,19 +109,6 @@ void destroy_env(Environment *env) {
 }
 
 /**
- * Prints the simulation grid as 1s and 0s.
- * @param env The environment to be printed.
- */
-void debug_print_environment(Environment const *env) {
-    for (int x = 0; x < env->width; x++) {
-        for (int y = 0; y < env->height; y++) {
-            printf("%d", access(env, x, y));
-        }
-        printf("\n");
-    }
-}
-
-/**
  * Clear all cells from the simulation grid.
  * @param env The simulation environment to be cleared.
  */
@@ -523,70 +510,4 @@ void change_cell_type(CellType *cell_type, SDL_KeyCode key) {
             *cell_type = (CellType) ConwayCell; // Also handles key 1
             break;
     }
-}
-
-
-/* SEEDS */
-
-/**
- * Initializes a seed with space for the specified number of cells.
- * @param cells The number of cells the seed will have
- * @return a seed with space for the specified number of cells.
- */
-Seed *init_seed(unsigned int cells) {
-    Seed *seed = (Seed *) malloc(sizeof(Seed));
-    assert(seed != NULL);
-    seed->cells = cells;
-    seed->points = (Coordinate *) malloc(sizeof(Coordinate) * cells);
-    assert(seed->points != NULL);
-    return seed;
-}
-
-/**
- * Frees a seed from memory.
- * @param seed The seed to be freed.
- */
-void destroy_seed(Seed *seed) {
-    free(seed->points);
-    free(seed);
-}
-
-/**
- * Places a seed in the environment.
- * @param env The environment containing the simulation grid
- * @param seed The seed to be placed in the simulation
- */
-void place_seed(Environment *env, Seed const *seed) {
-    env->data.initial_cells = seed->cells; // Record initial cells
-    for (int i = 0; i < seed->cells; i++) {
-        Coordinate coord = seed->points[i];
-        write(env, coord.x, coord.y, true);
-    }
-}
-
-// Custom seeds
-
-/**
- * Creates a shoebox seed at the origin.
- * @param x The x coordinate at which to place the seed
- * @param y The y coordinate at which to place the seed
- * @return The shoebox seed
- */
-Seed *ShoeBoxSeed(unsigned int x, unsigned int y) {
-    Seed *seed = init_seed(9);
-
-    seed->points[0] = (Coordinate) {-1, -1};
-    seed->points[1] = (Coordinate) {0, -1};
-    seed->points[2] = (Coordinate) {1, -1};
-    seed->points[3] = (Coordinate) {2, -1};
-    seed->points[4] = (Coordinate) {-1, 0};
-    seed->points[5] = (Coordinate) {2, 0};
-    seed->points[6] = (Coordinate) {-1, 1};
-    seed->points[7] = (Coordinate) {1, 1};
-    seed->points[8] = (Coordinate) {2, 1};
-
-    // Translate points and store in the seed
-    translate_coordinates(seed->points, seed->cells, (int) x, (int) y);
-
-    return seed;
 }

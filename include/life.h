@@ -25,11 +25,6 @@ typedef struct environment {
     bool *grid;
 } Environment;
 
-typedef struct seed {
-    unsigned int cells;
-    Coordinate *points;
-} Seed;
-
 /* NEIGHBOURHOODS */
 #define VonNeumann {0,-1}, {0,1}, {1,0}, {-1,0}
 #define VonNeumannCorners {1,-1}, {1,1}, {-1,-1}, {-1,1}
@@ -68,8 +63,6 @@ Environment *init_environment(unsigned int width, unsigned int height, unsigned 
 
 void destroy_env(Environment *env);
 
-void debug_print_environment(Environment const *env);
-
 void clear_env(Environment *env);
 
 bool access(Environment const *env, unsigned int x, unsigned int y);
@@ -101,15 +94,5 @@ bool von_neumann_r2_conway_next_state(Environment const *env, unsigned int x, un
 
 /* CELL TYPES */
 void change_cell_type(CellType *cell_type, SDL_KeyCode key);
-
-/* SEEDS */
-Seed *init_seed(unsigned int cells);
-
-void destroy_seed(Seed *seed);
-
-void place_seed(Environment *env, Seed const *seed);
-
-// Custom seeds
-Seed *ShoeBoxSeed(unsigned int x, unsigned int y);
 
 #endif
