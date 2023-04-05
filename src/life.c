@@ -13,11 +13,11 @@
 
 /* NEIGHBOURHOODS */
 const Neighbourhood VON_NEUMANN = {4, {VonNeumann}};
+const Neighbourhood VON_NEUMAN_CORNERS = {4, {VonNeumannCorners}};
 const Neighbourhood MOORE = {8, {Moore}};
 const Neighbourhood VON_NEUMANN_R2 = {12, {VonNeumannR2}};
 const Neighbourhood TRIPLE_MOORE = {20, {TripleMoore}};
 const Neighbourhood TRIPLE_MOORE_CORNER = {24, {TripleMooreCorner}};
-const Neighbourhood CORNER_VON_NEUMANN = {4, {CornerVonNeumann}};
 
 /* SIMULATION ANALYTICS */
 
@@ -366,6 +366,31 @@ bool noise_next_state(Environment const *env, unsigned int x, unsigned int y) {
 bool fractal_next_state(Environment const *env, unsigned int x, unsigned int y) {
     bool alive = access(env, x, y);
     unsigned int neighbours = num_neighbours(env, x, y, &VON_NEUMANN);
+
+    // If already alive
+    if (alive) {
+        if (neighbours >= 2) {
+            return true; // Must have more than two neighbours to live
+        }
+        return false;
+    }
+        // If dead
+    else {
+        return neighbours == 1; // Must have exactly 1 neighbour to be born
+    }
+}
+
+/**
+ * Calculates the next state for the cell at (x, y) based on a variation of the original CGOL rules using the Von
+ * Neumann diamond-shaped neighbourhood
+ * @param env The environment that holds the simulation
+ * @param x The x coordinate of the current cell
+ * @param y The y coordinate of the current cell
+ * @return The next state of the cell (true for alive, false for dead)
+ */
+bool fractal_corner_next_state(Environment const *env, unsigned int x, unsigned int y) {
+    bool alive = access(env, x, y);
+    unsigned int neighbours = num_neighbours(env, x, y, &VON_NEUMAN_CORNERS);
 
     // If already alive
     if (alive) {

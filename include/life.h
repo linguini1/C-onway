@@ -36,8 +36,8 @@ typedef struct seed {
 
 /* NEIGHBOURHOODS */
 #define VonNeumann {0,-1}, {0,1}, {1,0}, {-1,0}
-#define CornerVonNeumann {1,-1}, {1,1}, {-1,-1}, {-1,1}
-#define Moore VonNeumann, CornerVonNeumann
+#define VonNeumannCorners {1,-1}, {1,1}, {-1,-1}, {-1,1}
+#define Moore VonNeumann, VonNeumannCorners
 #define VonNeumannR2 Moore, {0,-2}, {0,2}, {2,0}, {-2,0}
 #define TripleMoore VonNeumannR2, {-1,-2}, {1,-2}, {-1,2}, {1, 2}, {-2,-1}, {-2,1}, {2,-1}, {2,1}
 #define TripleMooreCorner TripleMoore, {-2,-2}, {-2,2}, {2,-2}, {2,2}
@@ -59,6 +59,7 @@ typedef struct cell_type {
 #define MazeCell {"maze cell", maze_next_state}
 #define NoiseCell {"noise cell", noise_next_state}
 #define FractalCell {"fractal cell", fractal_next_state}
+#define FractalCornerCell {"fractal corner cell", fractal_corner_next_state}
 #define TripleMooreConwayCell {"triple moore conway cell", triple_moore_conway_next_state}
 #define OrganicMazeCell {"organic maze cell", organic_maze_next_state}
 #define VonNeumannR2ConwayCell {"von neumann r2 conway cell", von_neumann_r2_conway_next_state}
