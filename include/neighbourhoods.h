@@ -24,6 +24,7 @@ typedef struct neighbourhood {
 /* NEIGHBOURHOODS */
 #define VonNeumann {0,-1}, {0,1}, {1,0}, {-1,0}
 #define VonNeumannCorners {1,-1}, {1,1}, {-1,-1}, {-1,1}
+#define Lesse VonNeumannCorners, {0,-2}, {0,2}, {2,0}, {-2,0}
 #define Moore VonNeumann, VonNeumannCorners
 #define VonNeumannR2 Moore, {0,-2}, {0,2}, {2,0}, {-2,0}
 #define TripleMoore VonNeumannR2, {-1,-2}, {1,-2}, {-1,2}, {1, 2}, {-2,-1}, {-2,1}, {2,-1}, {2,1}
@@ -32,6 +33,7 @@ typedef struct neighbourhood {
 /* EXTERNAL NEIGHBOURHOOD CONSTANTS */
 extern const Neighbourhood VON_NEUMANN;
 extern const Neighbourhood VON_NEUMANN_CORNERS;
+extern const Neighbourhood LESSE;
 extern const Neighbourhood MOORE;
 extern const Neighbourhood VON_NEUMANN_R2;
 extern const Neighbourhood TRIPLE_MOORE;

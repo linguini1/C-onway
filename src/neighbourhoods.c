@@ -10,6 +10,7 @@
 /* NEIGHBOURHOODS */
 const Neighbourhood VON_NEUMANN = {4, {VonNeumann}};
 const Neighbourhood VON_NEUMANN_CORNERS = {4, {VonNeumannCorners}};
+const Neighbourhood LESSE = {8, {Lesse}};
 const Neighbourhood MOORE = {8, {Moore}};
 const Neighbourhood VON_NEUMANN_R2 = {12, {VonNeumannR2}};
 const Neighbourhood TRIPLE_MOORE = {20, {TripleMoore}};
