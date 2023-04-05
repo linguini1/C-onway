@@ -12,70 +12,11 @@
 /* CONSTANTS */
 
 /* NEIGHBOURHOODS */
-const Neighbourhood VON_NEUMANN = {
-        4,
-        {
-                {0,  -1}, // Up
-                {0,  1}, // Down
-                {1,  0}, // Right
-                {-1, 0}, // Left
-        }
-};
-
-const Neighbourhood MOORE = {
-        8,
-        {
-                {0,  -1}, // Up
-                {0,  1}, // Down
-                {1,  0}, // Right
-                {-1, 0}, // Left
-                {1,  -1}, // Upper right
-                {1,  1}, // Lower right
-                {-1, -1}, // Upper left
-                {-1, 1}, // Lower left
-        }
-};
-
-const Neighbourhood VON_NEUMANN_R2 = {
-        12,
-        {
-                {0,  -1}, // Up
-                {0,  1}, // Down
-                {1,  0}, // Right
-                {-1, 0}, // Left
-                {1,  -1}, // Upper right
-                {1,  1}, // Lower right
-                {-1, -1}, // Upper left
-                {-1, 1}, // Lower left
-                {0,  -2}, // Outer top
-                {0,  2}, // Outer bottom
-                {2,  0}, // Outer right
-                {-2, 0}, // Outer left
-        }
-};
-
-const Coordinate NEIGHBOURS[] = {
-        {0,  -1}, // Up
-        {0,  1}, // Down
-        {1,  0}, // Right
-        {-1, 0}, // Left
-        {1,  -1}, // Upper right
-        {1,  1}, // Lower right
-        {-1, -1}, // Upper left
-        {-1, 1}, // Lower left
-        {0,  -2}, // Outer top
-        {0,  2}, // Outer bottom
-        {2,  0}, // Outer right
-        {-2, 0}, // Outer left
-        {-1, -2}, // Left outer top
-        {1,  -2}, // Right outer top
-        {-1, 2}, // Left outer bottom
-        {1,  2}, // Right outer bottom
-        {-2, -1}, // Upper outer left
-        {-2, 1}, // Lower outer left
-        {2,  -1}, // Upper outer right
-        {2,  1}, // Lower outer right
-};
+const Neighbourhood VON_NEUMANN = {4, {VonNeumann}};
+const Neighbourhood MOORE = {8, {Moore}};
+const Neighbourhood VON_NEUMANN_R2 = {12, {VonNeumannR2}};
+const Neighbourhood TRIPLE_MOORE = {20, {TripleMoore}};
+const Neighbourhood TRIPLE_MOORE_CORNER = {24, {TripleMooreCorner}};
 
 /* SIMULATION ANALYTICS */
 
@@ -276,7 +217,7 @@ bool *neighbours(Environment const *env, unsigned int x, unsigned int y, Neighbo
 
     for (unsigned int i = 0; i < neighbourhood->size; i++) {
         // Calculate position of current neighbour in each of the 8 surrounding cells
-        Coordinate position = NEIGHBOURS[i];
+        Coordinate position = neighbourhood->neighbours[i];
         Coordinate neighbour = {(int) x + position.x, (int) y + position.y};
         neighbour = wrap(env, neighbour);  // If neighbour out of bounds, wrap around
 
@@ -295,7 +236,8 @@ bool *neighbours(Environment const *env, unsigned int x, unsigned int y, Neighbo
  * @param consider The number of neighbours to consider from the NEIGHBOURS constant, in the order they appear
  * @return The number of living neighbours around the current cell
  */
-unsigned int num_neighbours(Environment const *env, unsigned int x, unsigned int y, Neighbourhood const *neighbourhood) {
+unsigned int
+num_neighbours(Environment const *env, unsigned int x, unsigned int y, Neighbourhood const *neighbourhood) {
 
     int neighbour_count = 0;
     bool *neighbour_states = neighbours(env, x, y, neighbourhood); // Get neighbour states
@@ -444,23 +386,38 @@ bool stable_next_state(Environment const *env, unsigned int x, unsigned int y) {
  * @return The next state of the cell (true for alive, false for dead)
  */
 bool bridge_next_state(Environment const *env, unsigned int x, unsigned int y) {
-    unsigned int neighbours = num_neighbours(env, x, y, &MOORE);
+
     bool alive = access(env, x, y);
+    bool *neighbour_vector = neighbours(env, x, y, &TRIPLE_MOORE); // Determine neighbours
+
+    // The first eight neighbours
+    int neighbour_count = 0;
+    for (unsigned int i = 0; i < 8; i++) {
+        neighbour_count += neighbour_vector[i];
+    }
+    int closest_eight = neighbour_count;
+
+    // Get remaining neighbours using custom loop to save computation
+    for (unsigned int i = 8; i < TRIPLE_MOORE.size; i++) {
+        neighbour_count += neighbour_vector[i];
+    }
+    free(neighbour_vector); // Done with vector
 
     // If a cell is alive:
     if (alive) {
-        if (neighbours >= 4) {
+        if (neighbour_count <= 4 || neighbour_count >= 11 || closest_eight > 5) {
+            // If 1 or fewer neighbours, it dies
             // If 4 or more neighbours, it dies
             return false;
         } else {
-            return true;  // If it has less than 4 neighbours, it stays alive
+            return true;  // If it has 2-3 neighbours, it stays alive
         }
     }
 
         // If a cell is dead
     else {
         // And it has exactly 3 neighbours, it becomes alive
-        return neighbours == 3;
+        return (neighbour_count <= 10 && neighbour_count >= 7) && (closest_eight > 2 && closest_eight < 5);
     }
 }
 
@@ -510,7 +467,7 @@ bool complex_conway_next_state(Environment const *env, unsigned int x, unsigned 
 
     // Get remaining neighbours using custom loop to save computation
     int neighbour_count = closest_four;
-    for (unsigned int i = 4; i < VON_NEUMANN_R2.size; i++){
+    for (unsigned int i = 4; i < VON_NEUMANN_R2.size; i++) {
         neighbour_count += neighbour_vector[i];
     }
     free(neighbour_vector); // Done with vector

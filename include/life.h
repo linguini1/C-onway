@@ -34,6 +34,13 @@ typedef struct seed {
     Coordinate *points;
 } Seed;
 
+/* NEIGHBOURHOODS */
+#define VonNeumann {0,-1}, {0,1}, {1,0}, {-1,0}
+#define Moore VonNeumann, {1,-1}, {1,1}, {-1,-1}, {-1,1}
+#define VonNeumannR2 Moore, {0,-2}, {0,2}, {2,0}, {-2,0}
+#define TripleMoore VonNeumannR2, {-1,-2}, {1,-2}, {-1,2}, {1, 2}, {-2,-1}, {-2,1}, {2,-1}, {2,1}
+#define TripleMooreCorner TripleMoore, {-2,-2}, {-2,2}, {2,-2}, {2,2}
+
 typedef struct neighbourhood {
     unsigned short int size;
     Coordinate neighbours[];
