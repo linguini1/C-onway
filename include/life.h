@@ -46,7 +46,9 @@ typedef struct cell_type {
 #define MazeCell {"maze cell", maze_next_state}
 #define NoiseCell {"noise cell", noise_next_state}
 #define StableCell {"stable cell", stable_next_state}
-#define BridgeCell {"bridge cell", bridge_next_state};
+#define BridgeCell {"bridge cell", bridge_next_state}
+#define OrganicMazeCell {"organic maze cell", organic_maze_next_state}
+#define ComplexConwayCell {"complex conway cell", complex_conway_next_state}
 
 /* FUNCTION HEADERS */
 
@@ -76,7 +78,7 @@ void write(Environment *env, unsigned int x, unsigned int y, bool value);
 
 bool in_bounds(Environment const *env, unsigned int x, unsigned int y);
 
-bool *neighbours(Environment const *env, unsigned int x, unsigned int y);
+bool *neighbours(Environment const *env, unsigned int x, unsigned int y, unsigned int consider);
 
 int num_neighbours(Environment const *env, unsigned int x, unsigned int y, unsigned int consider);
 
@@ -92,6 +94,10 @@ bool noise_next_state(Environment const *env, unsigned int x, unsigned int y);
 bool stable_next_state(Environment const *env, unsigned int x, unsigned int y);
 
 bool bridge_next_state(Environment const *env, unsigned int x, unsigned int y);
+
+bool organic_maze_next_state(Environment const *env, unsigned int x, unsigned int y);
+
+bool complex_conway_next_state(Environment const *env, unsigned int x, unsigned int y);
 
 /* CELL TYPES */
 void change_cell_type(CellType *cell_type, SDL_KeyCode key);

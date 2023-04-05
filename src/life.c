@@ -10,7 +10,8 @@
 #include <stdio.h>
 
 /* CONSTANTS */
-const Coordinate NEIGHBOURS[8] = {
+#define NUM_COORDINATES 20
+const Coordinate NEIGHBOURS[NUM_COORDINATES] = {
         {0,  -1}, // Up
         {0,  1}, // Down
         {1,  0}, // Right
@@ -18,7 +19,19 @@ const Coordinate NEIGHBOURS[8] = {
         {1,  -1}, // Upper right
         {1,  1}, // Lower right
         {-1, -1}, // Upper left
-        {-1, 1} // Lower left
+        {-1, 1}, // Lower left
+        {0,  -2}, // Outer top
+        {0,  2}, // Outer bottom
+        {2,  0}, // Outer right
+        {-2, 0}, // Outer left
+        {-1, -2}, // Left outer top
+        {1,  -2}, // Right outer top
+        {-1, 2}, // Left outer bottom
+        {1,  2}, // Right outer bottom
+        {-2, -1}, // Upper outer left
+        {-2, 1}, // Lower outer left
+        {2,  -1}, // Upper outer right
+        {2,  1}, // Lower outer right
 };
 
 /* SIMULATION ANALYTICS */
@@ -196,9 +209,9 @@ void write(Environment *env, unsigned int x, unsigned int y, bool value) {
  * @param y The y coordinate to be checked
  * @return true if (x, y) are within bounds, false otherwise
  */
-bool in_bounds(Environment const *env, unsigned int x, unsigned int y){
+bool in_bounds(Environment const *env, unsigned int x, unsigned int y) {
     unsigned int index = env->width * y + x;
-    if (index < env->width * env->height){
+    if (index < env->width * env->height) {
         return true;
     }
     return false;
@@ -210,14 +223,18 @@ bool in_bounds(Environment const *env, unsigned int x, unsigned int y){
  * @param env The environment where the cell lives
  * @param x The x coordinate of the cell being examined
  * @param y The y coordinate of the cell being examined
+ * @param consider The number of neighbours to consider from the NEIGHBOURS constant, in the order they appear
  * @return An array of 8 booleans corresponding to the cell's 8 neighbours' states
  */
-bool *neighbours(Environment const *env, unsigned int x, unsigned int y){
+bool *neighbours(Environment const *env, unsigned int x, unsigned int y, unsigned int consider) {
+
+    // Can only consider as many neighbours as are listed in the coordinates constant, and minimum 1
+    assert(0 < consider && consider <= NUM_COORDINATES);
 
     // Create the array to hold neighbour states
-    bool *neighbour_states = malloc(sizeof(bool) * 8);
+    bool *neighbour_states = malloc(sizeof(bool) * consider);
 
-    for (unsigned int i = 0; i < 8; i++){
+    for (unsigned int i = 0; i < consider; i++) {
         // Calculate position of current neighbour in each of the 8 surrounding cells
         Coordinate position = NEIGHBOURS[i];
         Coordinate neighbour = {(int) x + position.x, (int) y + position.y};
@@ -232,22 +249,22 @@ bool *neighbours(Environment const *env, unsigned int x, unsigned int y){
 /**
  * Calculates the number of living neighbours surrounding the cell. Cells on the environment
  * border will look past the borders as though wrapping to the other side..
+ * @param env The environment where the cell lives
  * @param x The x coordinate of the current cell
  * @param y The y coordinate of the current cell
+ * @param consider The number of neighbours to consider from the NEIGHBOURS constant, in the order they appear
  * @return The number of living neighbours around the current cell
  */
 int num_neighbours(Environment const *env, unsigned int x, unsigned int y, unsigned int consider) {
 
-    assert(0 < consider && consider <= 8); // Can only consider max 8 neighbours and minimum 1
+    // Can only consider as many neighbours as are listed in the coordinates constant, and minimum 1
+    assert(0 < consider && consider <= NUM_COORDINATES);
 
     int neighbour_count = 0;
-    bool *neighbour_states = neighbours(env, x, y); // Get neighbour states
+    bool *neighbour_states = neighbours(env, x, y, consider); // Get neighbour states
 
     for (int i = 0; i < consider; i++) {
-        // Check if alive to increment total
-        if (neighbour_states[i]) {
-            neighbour_count++;
-        }
+        neighbour_count += neighbour_states[i]; // 1 if true, 0 if false, so total will be number of alive states
     }
     free(neighbour_states); // No longer used
     return neighbour_count;
@@ -410,6 +427,79 @@ bool bridge_next_state(Environment const *env, unsigned int x, unsigned int y) {
     }
 }
 
+/**
+ * Calculates the next state for the cell at (x, y) to create a more organic maze shape.
+ * @param env The environment that holds the simulation
+ * @param x The x coordinate of the current cell
+ * @param y The y coordinate of the current cell
+ * @return The next state of the cell (true for alive, false for dead)
+ */
+bool organic_maze_next_state(Environment const *env, unsigned int x, unsigned int y) {
+    int neighbours = num_neighbours(env, x, y, 12);
+    bool alive = access(env, x, y);
+
+    // If a cell is alive:
+    if (alive) {
+        if (neighbours <= 2 || neighbours > 6) {
+            // If 2 or fewer neighbours, it dies
+            // If 5 or more neighbours, it dies
+            return false;
+        } else {
+            return true;  // If it has 3-4 neighbours, it stays alive
+        }
+    }
+
+        // If a cell is dead
+    else {
+        // And it has exactly 4 neighbours, it becomes alive
+        return neighbours == 4;
+    }
+}
+
+/**
+ * Calculates the next state for the cell at (x, y) based on a more complex variation of Conway's original GOL rules.
+ * @param env The environment that holds the simulation
+ * @param x The x coordinate of the current cell
+ * @param y The y coordinate of the current cell
+ * @return The next state of the cell (true for alive, false for dead)
+ */
+bool complex_conway_next_state(Environment const *env, unsigned int x, unsigned int y) {
+
+    bool alive = access(env, x, y);
+    bool *neighbour_vector = neighbours(env, x, y, 12); // Determine neighbours
+
+    // Get totals using custom loop to save computation
+    int neighbour_count = 0;
+    // Check closest 4 neighbours
+    for (unsigned int i = 0; i < 4; i++){
+        neighbour_count += neighbour_vector[i];
+    }
+    bool closest_alive = neighbour_count > 0; // At least one of the closest 4 is alive
+
+    // Check remaining neighbours
+    for (unsigned int i = 4; i < 12; i++){
+        neighbour_count += neighbour_vector[i];
+    }
+    free(neighbour_vector); // Done with vector
+
+    // If a cell is alive:
+    if (alive) {
+        if (neighbour_count <= 2 || neighbour_count >= 6) {
+            // If 2 or fewer neighbours, it dies
+            // If 6 or more neighbours, it dies
+            return false;
+        } else {
+            return closest_alive;  // If it has 3-4 neighbours, it stays alive
+        }
+    }
+
+        // If a cell is dead
+    else {
+        // And it has exactly 4 neighbours, it becomes alive
+        return neighbour_count == 4;
+    }
+}
+
 /* CELL TYPES */
 /**
  * Resets the cell type to the specified cell type.
@@ -428,6 +518,12 @@ void change_cell_type(CellType *cell_type, SDL_KeyCode key) {
             break;
         case SDLK_5:
             *cell_type = (CellType) BridgeCell;
+            break;
+        case SDLK_6:
+            *cell_type = (CellType) ComplexConwayCell;
+            break;
+        case SDLK_7:
+            *cell_type = (CellType) OrganicMazeCell;
             break;
         default:
             *cell_type = (CellType) ConwayCell; // Also handles key 1
