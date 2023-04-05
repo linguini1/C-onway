@@ -6,6 +6,16 @@
 
 #include "neighbourhoods.h"
 
+/* CONSTANTS */
+const Neighbourhood VON_NEUMANN = {4, {VonNeumann}};
+const Neighbourhood VON_NEUMANN_CORNERS = {4, {VonNeumannCorners}};
+const Neighbourhood MOORE = {8, {Moore}};
+const Neighbourhood VON_NEUMANN_R2 = {12, {VonNeumannR2}};
+const Neighbourhood TRIPLE_MOORE = {20, {TripleMoore}};
+const Neighbourhood TRIPLE_MOORE_CORNER = {24, {TripleMooreCorner}};
+
+/* FUNCTION HEADERS */
+
 /**
  * Translates the coordinate.
  * @param coord The coordinate to be translated

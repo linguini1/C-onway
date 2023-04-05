@@ -25,6 +25,14 @@ typedef struct neighbourhood {
 #define TripleMoore VonNeumannR2, {-1,-2}, {1,-2}, {-1,2}, {1, 2}, {-2,-1}, {-2,1}, {2,-1}, {2,1}
 #define TripleMooreCorner TripleMoore, {-2,-2}, {-2,2}, {2,-2}, {2,2}
 
+/* EXTERNAL CONSTANTS */
+extern const Neighbourhood VON_NEUMANN;
+extern const Neighbourhood VON_NEUMANN_CORNERS;
+extern const Neighbourhood MOORE;
+extern const Neighbourhood VON_NEUMANN_R2;
+extern const Neighbourhood TRIPLE_MOORE;
+extern const Neighbourhood TRIPLE_MOORE_CORNER;
+
 /* FUNCTION HEADERS */
 
 /* COORDINATE MANIPULATION */
