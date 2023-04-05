@@ -1,5 +1,6 @@
 /**
-* Contains logic pertaining to cell neighbourhoods.
+* Contains logic for accessing different cell neighbourhoods, as well as some included cell neighbourhoods from
+ * established cellular automata.
  * @author Matteo Golin
  * @version 1.0
 */
@@ -28,15 +29,13 @@ typedef struct neighbourhood {
 #define TripleMoore VonNeumannR2, {-1,-2}, {1,-2}, {-1,2}, {1, 2}, {-2,-1}, {-2,1}, {2,-1}, {2,1}
 #define TripleMooreCorner TripleMoore, {-2,-2}, {-2,2}, {2,-2}, {2,2}
 
-/* EXTERNAL CONSTANTS */
+/* EXTERNAL NEIGHBOURHOOD CONSTANTS */
 extern const Neighbourhood VON_NEUMANN;
 extern const Neighbourhood VON_NEUMANN_CORNERS;
 extern const Neighbourhood MOORE;
 extern const Neighbourhood VON_NEUMANN_R2;
 extern const Neighbourhood TRIPLE_MOORE;
 extern const Neighbourhood TRIPLE_MOORE_CORNER;
-
-/* FUNCTION HEADERS */
 
 /* COORDINATE MANIPULATION */
 Coordinate translate(Coordinate coord, int x, int y);
@@ -45,8 +44,9 @@ void translate_coordinates(Coordinate *coords, unsigned int len, int x, int y);
 
 Coordinate wrap(Environment const *env, Coordinate coord);
 
+/* NEIGHBOUR LOGIC */
 bool *neighbours(Environment const *env, unsigned int x, unsigned int y, Neighbourhood const *neighbourhood);
 
 unsigned int num_neighbours(Environment const *env, unsigned int x, unsigned int y, Neighbourhood const *neighbourhood);
 
-#endif
+#endif // CONWAY_NEIGHBOURHOODS_H

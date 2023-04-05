@@ -1,5 +1,8 @@
 /**
-*
+* Contains rules for determining cell state, various cell types and logic for updating the simulation
+ * environment using those rules.
+ * @author Matteo Golin
+ * @version 1.0
 */
 
 #ifndef CONWAY_RULES_H
@@ -10,15 +13,12 @@
 #include <SDL.h>
 
 /* CUSTOM TYPES */
-
 typedef bool (*StateCalculator)(Environment const *, unsigned int, unsigned int);
 
 typedef struct cell_type {
     char *name;
     StateCalculator calculator;
 } CellType;
-
-/* FUNCTION HEADERS */
 
 /* STATE CALCULATORS */
 bool conway_next_state(Environment const *env, unsigned int x, unsigned int y);
@@ -45,13 +45,13 @@ bool von_neumann_r2_conway_next_state(Environment const *env, unsigned int x, un
 #define OrganicMazeCell {"organic maze cell", organic_maze_next_state}
 #define VonNeumannR2ConwayCell {"von neumann r2 conway cell", von_neumann_r2_conway_next_state}
 
-void change_cell_type(CellType *cell_type, SDL_KeyCode key);
-
 /* SIMULATION ANALYTICS */
 void populate_analytics_string(char **string, Environment const *env, CellType *cell_type);
 
 /* SIMULATION ENVIRONMENT */
-
 void next_generation(Environment *env, CellType *cell_type);
 
-#endif
+/* MENU CONTROLS */
+void change_cell_type(CellType *cell_type, SDL_KeyCode key);
+
+#endif // CONWAY_RULES_H

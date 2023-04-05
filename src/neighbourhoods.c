@@ -1,5 +1,5 @@
 /**
-* Contains logic pertaining to cell neighbourhoods.
+* Contains logic for accessing different cell neighbourhoods.
  * @author Matteo Golin
  * @version 1.0
 */
@@ -7,7 +7,7 @@
 #include "neighbourhoods.h"
 #include <stdlib.h>
 
-/* CONSTANTS */
+/* NEIGHBOURHOODS */
 const Neighbourhood VON_NEUMANN = {4, {VonNeumann}};
 const Neighbourhood VON_NEUMANN_CORNERS = {4, {VonNeumannCorners}};
 const Neighbourhood MOORE = {8, {Moore}};
@@ -15,7 +15,7 @@ const Neighbourhood VON_NEUMANN_R2 = {12, {VonNeumannR2}};
 const Neighbourhood TRIPLE_MOORE = {20, {TripleMoore}};
 const Neighbourhood TRIPLE_MOORE_CORNER = {24, {TripleMooreCorner}};
 
-/* FUNCTION HEADERS */
+/* COORDINATE MANIPULATION */
 
 /**
  * Translates the coordinate.
@@ -61,6 +61,8 @@ Coordinate wrap(Environment const *env, Coordinate coord) {
     }
     return coord;
 }
+
+/* NEIGHBOUR LOGIC */
 
 /**
  * Returns an array of 8 booleans representing the state of each of a cells 8 neighbours (in order of the NEIGHBOURS

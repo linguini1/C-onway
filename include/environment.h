@@ -1,7 +1,8 @@
 /**
+ * Contains logic for creating and manipulating the simulation environment along with simulation analytics.
  * @author Matteo Golin
  * @version 1.0
-*/
+ */
 
 #ifndef CONWAY_ENVIRONMENT_H
 #define CONWAY_ENVIRONMENT_H
@@ -23,17 +24,18 @@ typedef struct environment {
     bool *grid;
 } Environment;
 
-/* SIMULATION ENVIRONMENT */
+/* ENVIRONMENT MANAGEMENT */
 Environment *init_environment(unsigned int width, unsigned int height, unsigned int generation_speed);
 
 void destroy_env(Environment *env);
 
 void clear_env(Environment *env);
 
+/* ENVIRONMENT ACCESS & MANIPULATION */
 bool access(Environment const *env, unsigned int x, unsigned int y);
 
 void write(Environment *env, unsigned int x, unsigned int y, bool value);
 
 bool in_bounds(Environment const *env, unsigned int x, unsigned int y);
 
-#endif
+#endif // CONWAY_ENVIRONMENT_H

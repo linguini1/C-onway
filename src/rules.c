@@ -1,7 +1,11 @@
 /**
-*
+* Contains rules for determining cell state, various cell types and logic for updating the simulation
+ * environment using those rules.
+ * @author Matteo Golin
+ * @version 1.0
 */
 
+#include "asprintf.h"
 #include "rules.h"
 #include <stdlib.h>
 
@@ -247,6 +251,61 @@ bool von_neumann_r2_conway_next_state(Environment const *env, unsigned int x, un
     }
 }
 
+/* SIMULATION ANALYTICS */
+/**
+ * Populates a string with the most recent simulation analytics.
+ * @param string Pointer to the string that will contain the analytics
+ * @param env The environment to gather analytics on
+ * @param cell_type The cell type currently being used in the simulation
+ */
+void populate_analytics_string(char **string, Environment const *env, CellType *cell_type) {
+
+    SimulationAnalytics data = env->data;
+    float percent_alive = ((float) (data.total_cells) / (float) (env->width * env->height)) * 100.0f;
+    float initial_cells = data.initial_cells == 0 ? 1.0f : (float) data.initial_cells;
+    float growth = ((float) data.total_cells / initial_cells) * 100.0f;
+
+    asprintf(
+            string,
+            "cell type: %s\ngenerations: %llu\ninitial cells: %u\ncells: %lu\npercentage alive: %.3f%%\ngrowth: %.1f%%\ngeneration length: %ums",
+            cell_type->name,
+            data.generations,
+            data.initial_cells,
+            data.total_cells,
+            percent_alive,
+            growth,
+            data.generation_speed
+    );
+}
+
+/* SIMULATION ENVIRONMENT */
+/**
+ * Steps through one generation of the simulation, calculating the next one.
+ * @param env The environment to update with the next generation
+ */
+void next_generation(Environment *env, CellType *cell_type) {
+
+    env->data.total_cells = 0; // Reset cell total
+    env->data.generations++; // Increase generations
+
+    // Update the copy with all the new states
+    bool *copy = (bool *) malloc(sizeof(bool) * env->width * env->height);
+    for (int x = 0; x < env->width; x++) {
+        for (int y = 0; y < env->height; y++) {
+            bool state = cell_type->calculator(env, x, y);
+
+            // Increase cell total
+            if (state) {
+                env->data.total_cells++;
+            }
+            copy[(env->width * y) + x] = state; // Write next state onto the copy
+        }
+    }
+    free(env->grid);
+    env->grid = copy;
+}
+
+/* MENU CONTROLS */
 /**
  * Resets the cell type to the specified cell type.
  * @param cell_type A pointer to the current cell type variable being used by the game
@@ -275,50 +334,4 @@ void change_cell_type(CellType *cell_type, SDL_KeyCode key) {
             *cell_type = (CellType) ConwayCell; // Also handles key 1
             break;
     }
-}
-
-void populate_analytics_string(char **string, Environment const *env, CellType *cell_type) {
-
-    SimulationAnalytics data = env->data;
-    float percent_alive = ((float) (data.total_cells) / (float) (env->width * env->height)) * 100.0f;
-    float initial_cells = data.initial_cells == 0 ? 1.0f : (float) data.initial_cells;
-    float growth = ((float) data.total_cells / initial_cells) * 100.0f;
-
-    asprintf(
-            string,
-            "cell type: %s\ngenerations: %llu\ninitial cells: %u\ncells: %lu\npercentage alive: %.3f%%\ngrowth: %.1f%%\ngeneration length: %ums",
-            cell_type->name,
-            data.generations,
-            data.initial_cells,
-            data.total_cells,
-            percent_alive,
-            growth,
-            data.generation_speed
-    );
-}
-
-/**
- * Steps through one generation of the simulation, calculating the next one.
- * @param env The environment to update with the next generation
- */
-void next_generation(Environment *env, CellType *cell_type) {
-
-    env->data.total_cells = 0; // Reset cell total
-    env->data.generations++; // Increase generations
-
-    // Update the copy with all the new states
-    bool *copy = (bool *) malloc(sizeof(bool) * env->width * env->height);
-    for (int x = 0; x < env->width; x++) {
-        for (int y = 0; y < env->height; y++) {
-            bool state = cell_type->calculator(env, x, y);
-
-            // Increase cell total
-            if (state) {
-                env->data.total_cells++;
-            }
-            copy[(env->width * y) + x] = state; // Write next state onto the copy
-        }
-    }
-    free(env->grid);
-    env->grid = copy;
 }

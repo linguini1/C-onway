@@ -1,4 +1,5 @@
 /**
+ * Contains logic for creating and manipulating the simulation environment, along with simulation analytics.
  * @author Matteo Golin
  * @version 1.0
  */
@@ -6,6 +7,8 @@
 #include "environment.h"
 #include <stdlib.h>
 #include <assert.h>
+
+/* ENVIRONMENT MANAGEMENT */
 
 /**
  * Create the Environment (grid) for cell growth to occur in, starting with all dead cells.
@@ -64,6 +67,8 @@ void clear_env(Environment *env) {
     env->data.total_cells = 0;
     env->data.generations = 0;
 }
+
+/* ENVIRONMENT ACCESS & MANIPULATION */
 
 /**
  * Allows indexing of the flattened 2D array environment

@@ -32,4 +32,4 @@ typedef struct palette {
 void set_draw_colour(SDL_Renderer *renderer, Palette const *palette, bool light);
 
 
-#endif
+#endif // CONWAY_PALETTES_H
