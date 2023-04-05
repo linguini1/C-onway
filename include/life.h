@@ -34,6 +34,11 @@ typedef struct seed {
     Coordinate *points;
 } Seed;
 
+typedef struct neighbourhood {
+    unsigned short int size;
+    Coordinate neighbours[];
+} Neighbourhood;
+
 // State calculation functions
 typedef bool (*StateCalculator)(Environment const *, unsigned int, unsigned int);
 
@@ -78,9 +83,9 @@ void write(Environment *env, unsigned int x, unsigned int y, bool value);
 
 bool in_bounds(Environment const *env, unsigned int x, unsigned int y);
 
-bool *neighbours(Environment const *env, unsigned int x, unsigned int y, unsigned int consider);
+bool *neighbours(Environment const *env, unsigned int x, unsigned int y, Neighbourhood const *neighbourhood);
 
-unsigned int num_neighbours(Environment const *env, unsigned int x, unsigned int y, unsigned int consider);
+unsigned int num_neighbours(Environment const *env, unsigned int x, unsigned int y, Neighbourhood const *neighbourhood);
 
 void next_generation(Environment *env, CellType *cell_type);
 
