@@ -4,7 +4,7 @@
  * @version 1.1
  */
 #include "palettes.h"
-#include "life.h"
+#include "rules.h"
 #include <stdio.h>
 #include <stdbool.h>
 #include <SDL.h>
