@@ -6,6 +6,9 @@
 #ifndef CONWAY_NEIGHBOURHOODS_H
 #define CONWAY_NEIGHBOURHOODS_H
 
+#include <stdbool.h>
+#include "environment.h"
+
 /* CUSTOM TYPES */
 typedef struct coord {
     int x;
@@ -39,5 +42,11 @@ extern const Neighbourhood TRIPLE_MOORE_CORNER;
 Coordinate translate(Coordinate coord, int x, int y);
 
 void translate_coordinates(Coordinate *coords, unsigned int len, int x, int y);
+
+Coordinate wrap(Environment const *env, Coordinate coord);
+
+bool *neighbours(Environment const *env, unsigned int x, unsigned int y, Neighbourhood const *neighbourhood);
+
+unsigned int num_neighbours(Environment const *env, unsigned int x, unsigned int y, Neighbourhood const *neighbourhood);
 
 #endif

@@ -19,11 +19,6 @@ typedef struct cell_type {
 } CellType;
 
 /* FUNCTION HEADERS */
-Coordinate wrap(Environment const *env, Coordinate coord);
-
-bool *neighbours(Environment const *env, unsigned int x, unsigned int y, Neighbourhood const *neighbourhood);
-
-unsigned int num_neighbours(Environment const *env, unsigned int x, unsigned int y, Neighbourhood const *neighbourhood);
 
 /* STATE CALCULATORS */
 bool conway_next_state(Environment const *env, unsigned int x, unsigned int y);
