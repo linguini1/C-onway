@@ -474,29 +474,30 @@ bool complex_conway_next_state(Environment const *env, unsigned int x, unsigned 
     for (unsigned int i = 0; i < 4; i++){
         neighbour_count += neighbour_vector[i];
     }
-    bool closest_alive = neighbour_count > 0; // At least one of the closest 4 is alive
-
+    int closest_four = neighbour_count; // The first four neighbours
+    bool upndown = neighbour_vector[0] && neighbour_vector[1];
     // Check remaining neighbours
     for (unsigned int i = 4; i < 12; i++){
         neighbour_count += neighbour_vector[i];
     }
+
     free(neighbour_vector); // Done with vector
 
     // If a cell is alive:
     if (alive) {
-        if (neighbour_count <= 2 || neighbour_count >= 6) {
+        if (neighbour_count <= 2 || neighbour_count >= 6 || closest_four > 3) {
             // If 2 or fewer neighbours, it dies
             // If 6 or more neighbours, it dies
             return false;
         } else {
-            return closest_alive;  // If it has 3-4 neighbours, it stays alive
+            return (closest_four > 0);  // If it has 3-4 neighbours, it stays alive
         }
     }
 
         // If a cell is dead
     else {
         // And it has exactly 4 neighbours, it becomes alive
-        return neighbour_count == 4;
+        return (neighbour_count == 4) && (closest_four > 0);
     }
 }
 
