@@ -6,6 +6,7 @@
 #ifndef CONWAY_LIFE_H
 #define CONWAY_LIFE_H
 
+#include "neighbourhoods.h"
 #include <stdbool.h>
 #include <SDL.h>
 
@@ -24,11 +25,6 @@ typedef struct environment {
     bool *grid;
 } Environment;
 
-typedef struct coord {
-    int x;
-    int y;
-} Coordinate;
-
 typedef struct seed {
     unsigned int cells;
     Coordinate *points;
@@ -41,11 +37,6 @@ typedef struct seed {
 #define VonNeumannR2 Moore, {0,-2}, {0,2}, {2,0}, {-2,0}
 #define TripleMoore VonNeumannR2, {-1,-2}, {1,-2}, {-1,2}, {1, 2}, {-2,-1}, {-2,1}, {2,-1}, {2,1}
 #define TripleMooreCorner TripleMoore, {-2,-2}, {-2,2}, {2,-2}, {2,2}
-
-typedef struct neighbourhood {
-    unsigned short int size;
-    Coordinate neighbours[];
-} Neighbourhood;
 
 // State calculation functions
 typedef bool (*StateCalculator)(Environment const *, unsigned int, unsigned int);
@@ -70,10 +61,6 @@ typedef struct cell_type {
 void populate_analytics_string(char **string, Environment const *env, CellType *cell_type);
 
 /* COORDINATE MANIPULATION */
-Coordinate translate(Coordinate coord, int x, int y);
-
-void translate_coordinates(Coordinate *coords, unsigned int len, int x, int y);
-
 Coordinate wrap(Environment const *env, Coordinate coord);
 
 /* SIMULATION ENVIRONMENT */
@@ -84,7 +71,6 @@ void destroy_env(Environment *env);
 void debug_print_environment(Environment const *env);
 
 void clear_env(Environment *env);
-
 
 bool access(Environment const *env, unsigned int x, unsigned int y);
 

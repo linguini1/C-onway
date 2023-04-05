@@ -1,0 +1,35 @@
+/**
+* Contains logic pertaining to cell neighbourhoods.
+ * @author Matteo Golin
+ * @version 1.0
+*/
+#ifndef CONWAY_NEIGHBOURHOODS_H
+#define CONWAY_NEIGHBOURHOODS_H
+
+/* CUSTOM TYPES */
+typedef struct coord {
+    int x;
+    int y;
+} Coordinate;
+
+typedef struct neighbourhood {
+    unsigned short int size;
+    Coordinate neighbours[];
+} Neighbourhood;
+
+/* NEIGHBOURHOODS */
+#define VonNeumann {0,-1}, {0,1}, {1,0}, {-1,0}
+#define VonNeumannCorners {1,-1}, {1,1}, {-1,-1}, {-1,1}
+#define Moore VonNeumann, VonNeumannCorners
+#define VonNeumannR2 Moore, {0,-2}, {0,2}, {2,0}, {-2,0}
+#define TripleMoore VonNeumannR2, {-1,-2}, {1,-2}, {-1,2}, {1, 2}, {-2,-1}, {-2,1}, {2,-1}, {2,1}
+#define TripleMooreCorner TripleMoore, {-2,-2}, {-2,2}, {2,-2}, {2,2}
+
+/* FUNCTION HEADERS */
+
+/* COORDINATE MANIPULATION */
+Coordinate translate(Coordinate coord, int x, int y);
+
+void translate_coordinates(Coordinate *coords, unsigned int len, int x, int y);
+
+#endif
