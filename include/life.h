@@ -34,6 +34,18 @@ typedef struct seed {
     Coordinate *points;
 } Seed;
 
+/* NEIGHBOURHOODS */
+#define VonNeumann {0,-1}, {0,1}, {1,0}, {-1,0}
+#define Moore VonNeumann, {1,-1}, {1,1}, {-1,-1}, {-1,1}
+#define VonNeumannR2 Moore, {0,-2}, {0,2}, {2,0}, {-2,0}
+#define TripleMoore VonNeumannR2, {-1,-2}, {1,-2}, {-1,2}, {1, 2}, {-2,-1}, {-2,1}, {2,-1}, {2,1}
+#define TripleMooreCorner TripleMoore, {-2,-2}, {-2,2}, {2,-2}, {2,2}
+
+typedef struct neighbourhood {
+    unsigned short int size;
+    Coordinate neighbours[];
+} Neighbourhood;
+
 // State calculation functions
 typedef bool (*StateCalculator)(Environment const *, unsigned int, unsigned int);
 
@@ -46,7 +58,9 @@ typedef struct cell_type {
 #define MazeCell {"maze cell", maze_next_state}
 #define NoiseCell {"noise cell", noise_next_state}
 #define StableCell {"stable cell", stable_next_state}
-#define BridgeCell {"bridge cell", bridge_next_state};
+#define BridgeCell {"bridge cell", bridge_next_state}
+#define OrganicMazeCell {"organic maze cell", organic_maze_next_state}
+#define ComplexConwayCell {"complex conway cell", complex_conway_next_state}
 
 /* FUNCTION HEADERS */
 
@@ -76,9 +90,9 @@ void write(Environment *env, unsigned int x, unsigned int y, bool value);
 
 bool in_bounds(Environment const *env, unsigned int x, unsigned int y);
 
-bool *neighbours(Environment const *env, unsigned int x, unsigned int y);
+bool *neighbours(Environment const *env, unsigned int x, unsigned int y, Neighbourhood const *neighbourhood);
 
-int num_neighbours(Environment const *env, unsigned int x, unsigned int y, unsigned int consider);
+unsigned int num_neighbours(Environment const *env, unsigned int x, unsigned int y, Neighbourhood const *neighbourhood);
 
 void next_generation(Environment *env, CellType *cell_type);
 
@@ -92,6 +106,10 @@ bool noise_next_state(Environment const *env, unsigned int x, unsigned int y);
 bool stable_next_state(Environment const *env, unsigned int x, unsigned int y);
 
 bool bridge_next_state(Environment const *env, unsigned int x, unsigned int y);
+
+bool organic_maze_next_state(Environment const *env, unsigned int x, unsigned int y);
+
+bool complex_conway_next_state(Environment const *env, unsigned int x, unsigned int y);
 
 /* CELL TYPES */
 void change_cell_type(CellType *cell_type, SDL_KeyCode key);
