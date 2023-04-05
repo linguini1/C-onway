@@ -139,6 +139,36 @@ bool fractal_corner_next_state(Environment const *env, unsigned int x, unsigned 
 }
 
 /**
+ * Calculates the next state for the cell at (x, y) based on Conway's original Game of Life rules in the Lesse
+ * neighbourhood.
+ * @param env The environment that holds the simulation
+ * @param x The x coordinate of the current cell
+ * @param y The y coordinate of the current cell
+ * @return The next state of the cell (true for alive, false for dead)
+ */
+bool lesse_conway_next_state(Environment const *env, unsigned int x, unsigned int y) {
+    unsigned int neighbours = num_neighbours(env, x, y, &LESSE);
+    bool alive = access(env, x, y);
+
+    // If a cell is alive:
+    if (alive) {
+        if (neighbours <= 1 || neighbours >= 4) {
+            // If 1 or fewer neighbours, it dies
+            // If 4 or more neighbours, it dies
+            return false;
+        } else {
+            return true;  // If it has 2-3 neighbours, it stays alive
+        }
+    }
+
+        // If a cell is dead
+    else {
+        // And it has exactly 3 neighbours, it becomes alive
+        return neighbours == 3;
+    }
+}
+
+/**
  * Calculates the next state for the cell at (x, y) based on the Triple Moore variation of the original CGOL rules
  * @param env The environment that holds the simulation
  * @param x The x coordinate of the current cell
@@ -182,35 +212,6 @@ bool triple_moore_conway_next_state(Environment const *env, unsigned int x, unsi
 }
 
 /**
- * Calculates the next state for the cell at (x, y) to create a more organic maze shape.
- * @param env The environment that holds the simulation
- * @param x The x coordinate of the current cell
- * @param y The y coordinate of the current cell
- * @return The next state of the cell (true for alive, false for dead)
- */
-bool organic_maze_next_state(Environment const *env, unsigned int x, unsigned int y) {
-    unsigned int neighbours = num_neighbours(env, x, y, &VON_NEUMANN_R2);
-    bool alive = access(env, x, y);
-
-    // If a cell is alive:
-    if (alive) {
-        if (neighbours <= 2 || neighbours > 6) {
-            // If 2 or fewer neighbours, it dies
-            // If 5 or more neighbours, it dies
-            return false;
-        } else {
-            return true;  // If it has 3-4 neighbours, it stays alive
-        }
-    }
-
-        // If a cell is dead
-    else {
-        // And it has exactly 4 neighbours, it becomes alive
-        return neighbours == 4;
-    }
-}
-
-/**
  * Calculates the next state for the cell at (x, y) based on a more complex variation of Conway's original GOL rules.
  * @param env The environment that holds the simulation
  * @param x The x coordinate of the current cell
@@ -248,6 +249,35 @@ bool von_neumann_r2_conway_next_state(Environment const *env, unsigned int x, un
     else {
         // And it has exactly 4 neighbours, it becomes alive
         return (neighbour_count == 4) && (closest_four > 0);
+    }
+}
+
+/**
+ * Calculates the next state for the cell at (x, y) to create a more organic maze shape.
+ * @param env The environment that holds the simulation
+ * @param x The x coordinate of the current cell
+ * @param y The y coordinate of the current cell
+ * @return The next state of the cell (true for alive, false for dead)
+ */
+bool organic_maze_next_state(Environment const *env, unsigned int x, unsigned int y) {
+    unsigned int neighbours = num_neighbours(env, x, y, &VON_NEUMANN_R2);
+    bool alive = access(env, x, y);
+
+    // If a cell is alive:
+    if (alive) {
+        if (neighbours <= 2 || neighbours > 6) {
+            // If 2 or fewer neighbours, it dies
+            // If 5 or more neighbours, it dies
+            return false;
+        } else {
+            return true;  // If it has 3-4 neighbours, it stays alive
+        }
+    }
+
+        // If a cell is dead
+    else {
+        // And it has exactly 4 neighbours, it becomes alive
+        return neighbours == 4;
     }
 }
 
@@ -313,21 +343,24 @@ void next_generation(Environment *env, CellType *cell_type) {
 void change_cell_type(CellType *cell_type, SDL_KeyCode key) {
     switch (key) {
         case SDLK_2:
-            *cell_type = (CellType) VonNeumannR2ConwayCell;
+            *cell_type = (CellType) LesseConwayCell;
             break;
         case SDLK_3:
-            *cell_type = (CellType) TripleMooreConwayCell;
+            *cell_type = (CellType) VonNeumannR2ConwayCell;
             break;
         case SDLK_4:
-            *cell_type = (CellType) MazeCell;
+            *cell_type = (CellType) TripleMooreConwayCell;
             break;
         case SDLK_5:
-            *cell_type = (CellType) FractalCornerCell;
+            *cell_type = (CellType) MazeCell;
             break;
         case SDLK_6:
-            *cell_type = (CellType) FractalCell;
+            *cell_type = (CellType) FractalCornerCell;
             break;
         case SDLK_7:
+            *cell_type = (CellType) FractalCell;
+            break;
+        case SDLK_8:
             *cell_type = (CellType) NoiseCell;
             break;
         default:

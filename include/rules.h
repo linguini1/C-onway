@@ -41,9 +41,10 @@ bool von_neumann_r2_conway_next_state(Environment const *env, unsigned int x, un
 #define NoiseCell {"noise cell", noise_next_state}
 #define FractalCell {"fractal cell", fractal_next_state}
 #define FractalCornerCell {"fractal corner cell", fractal_corner_next_state}
+#define LesseConwayCell {"lesse conway cell", lesse_conway_next_state}
 #define TripleMooreConwayCell {"triple moore conway cell", triple_moore_conway_next_state}
-#define OrganicMazeCell {"organic maze cell", organic_maze_next_state}
 #define VonNeumannR2ConwayCell {"von neumann r2 conway cell", von_neumann_r2_conway_next_state}
+#define OrganicMazeCell {"organic maze cell", organic_maze_next_state}
 
 /* SIMULATION ANALYTICS */
 void populate_analytics_string(char **string, Environment const *env, CellType *cell_type);
