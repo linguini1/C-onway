@@ -36,7 +36,8 @@ typedef struct seed {
 
 /* NEIGHBOURHOODS */
 #define VonNeumann {0,-1}, {0,1}, {1,0}, {-1,0}
-#define Moore VonNeumann, {1,-1}, {1,1}, {-1,-1}, {-1,1}
+#define CornerVonNeumann {1,-1}, {1,1}, {-1,-1}, {-1,1}
+#define Moore VonNeumann, CornerVonNeumann
 #define VonNeumannR2 Moore, {0,-2}, {0,2}, {2,0}, {-2,0}
 #define TripleMoore VonNeumannR2, {-1,-2}, {1,-2}, {-1,2}, {1, 2}, {-2,-1}, {-2,1}, {2,-1}, {2,1}
 #define TripleMooreCorner TripleMoore, {-2,-2}, {-2,2}, {2,-2}, {2,2}
@@ -57,10 +58,10 @@ typedef struct cell_type {
 #define ConwayCell {"conway cell", conway_next_state}
 #define MazeCell {"maze cell", maze_next_state}
 #define NoiseCell {"noise cell", noise_next_state}
-#define StableCell {"stable cell", stable_next_state}
-#define BridgeCell {"bridge cell", bridge_next_state}
+#define FractalCell {"fractal cell", fractal_next_state}
+#define TripleMooreConwayCell {"triple moore conway cell", triple_moore_conway_next_state}
 #define OrganicMazeCell {"organic maze cell", organic_maze_next_state}
-#define ComplexConwayCell {"complex conway cell", complex_conway_next_state}
+#define VonNeumannR2ConwayCell {"von neumann r2 conway cell", von_neumann_r2_conway_next_state}
 
 /* FUNCTION HEADERS */
 
@@ -103,13 +104,13 @@ bool maze_next_state(Environment const *env, unsigned int x, unsigned int y);
 
 bool noise_next_state(Environment const *env, unsigned int x, unsigned int y);
 
-bool stable_next_state(Environment const *env, unsigned int x, unsigned int y);
+bool fractal_next_state(Environment const *env, unsigned int x, unsigned int y);
 
-bool bridge_next_state(Environment const *env, unsigned int x, unsigned int y);
+bool triple_moore_conway_next_state(Environment const *env, unsigned int x, unsigned int y);
 
 bool organic_maze_next_state(Environment const *env, unsigned int x, unsigned int y);
 
-bool complex_conway_next_state(Environment const *env, unsigned int x, unsigned int y);
+bool von_neumann_r2_conway_next_state(Environment const *env, unsigned int x, unsigned int y);
 
 /* CELL TYPES */
 void change_cell_type(CellType *cell_type, SDL_KeyCode key);

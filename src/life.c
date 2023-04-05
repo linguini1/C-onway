@@ -17,6 +17,7 @@ const Neighbourhood MOORE = {8, {Moore}};
 const Neighbourhood VON_NEUMANN_R2 = {12, {VonNeumannR2}};
 const Neighbourhood TRIPLE_MOORE = {20, {TripleMoore}};
 const Neighbourhood TRIPLE_MOORE_CORNER = {24, {TripleMooreCorner}};
+const Neighbourhood CORNER_VON_NEUMANN = {4, {CornerVonNeumann}};
 
 /* SIMULATION ANALYTICS */
 
@@ -355,37 +356,38 @@ bool noise_next_state(Environment const *env, unsigned int x, unsigned int y) {
 }
 
 /**
- * Calculates the next state for the cell at (x, y) based on the rules for Stable cells
+ * Calculates the next state for the cell at (x, y) based on a variation of the original CGOL rules using the Von
+ * Neumann neighbourhood
  * @param env The environment that holds the simulation
  * @param x The x coordinate of the current cell
  * @param y The y coordinate of the current cell
  * @return The next state of the cell (true for alive, false for dead)
  */
-bool stable_next_state(Environment const *env, unsigned int x, unsigned int y) {
+bool fractal_next_state(Environment const *env, unsigned int x, unsigned int y) {
     bool alive = access(env, x, y);
     unsigned int neighbours = num_neighbours(env, x, y, &VON_NEUMANN);
 
     // If already alive
     if (alive) {
-        if (2 <= neighbours && neighbours <= 3) {
-            return true; // must have 2-3 neighbours to survive
+        if (neighbours >= 2) {
+            return true; // Must have more than two neighbours to live
         }
         return false;
     }
         // If dead
     else {
-        return neighbours == 2; // Exactly 2 neighbours to live
+        return neighbours == 1; // Must have exactly 1 neighbour to be born
     }
 }
 
 /**
- * Calculates the next state for the cell at (x, y) based on Bridge cell rules
+ * Calculates the next state for the cell at (x, y) based on the Triple Moore variation of the original CGOL rules
  * @param env The environment that holds the simulation
  * @param x The x coordinate of the current cell
  * @param y The y coordinate of the current cell
  * @return The next state of the cell (true for alive, false for dead)
  */
-bool bridge_next_state(Environment const *env, unsigned int x, unsigned int y) {
+bool triple_moore_conway_next_state(Environment const *env, unsigned int x, unsigned int y) {
 
     bool alive = access(env, x, y);
     bool *neighbour_vector = neighbours(env, x, y, &TRIPLE_MOORE); // Determine neighbours
@@ -457,7 +459,7 @@ bool organic_maze_next_state(Environment const *env, unsigned int x, unsigned in
  * @param y The y coordinate of the current cell
  * @return The next state of the cell (true for alive, false for dead)
  */
-bool complex_conway_next_state(Environment const *env, unsigned int x, unsigned int y) {
+bool von_neumann_r2_conway_next_state(Environment const *env, unsigned int x, unsigned int y) {
 
     bool alive = access(env, x, y);
     bool *neighbour_vector = neighbours(env, x, y, &VON_NEUMANN_R2); // Determine neighbours
@@ -505,13 +507,13 @@ void change_cell_type(CellType *cell_type, SDL_KeyCode key) {
             *cell_type = (CellType) NoiseCell;
             break;
         case SDLK_4:
-            *cell_type = (CellType) StableCell;
+            *cell_type = (CellType) FractalCell;
             break;
         case SDLK_5:
-            *cell_type = (CellType) BridgeCell;
+            *cell_type = (CellType) TripleMooreConwayCell;
             break;
         case SDLK_6:
-            *cell_type = (CellType) ComplexConwayCell;
+            *cell_type = (CellType) VonNeumannR2ConwayCell;
             break;
         case SDLK_7:
             *cell_type = (CellType) OrganicMazeCell;
