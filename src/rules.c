@@ -318,8 +318,7 @@ void next_generation(Environment *env, CellType *cell_type) {
     env->data.total_cells = 0; // Reset cell total
     env->data.generations++; // Increase generations
 
-    // Update the copy with all the new states
-    bool *copy = (bool *) malloc(sizeof(bool) * env->width * env->height);
+    // Update the next generation with all the new states
     for (int x = 0; x < env->width; x++) {
         for (int y = 0; y < env->height; y++) {
             bool state = cell_type->calculator(env, x, y);
@@ -328,11 +327,14 @@ void next_generation(Environment *env, CellType *cell_type) {
             if (state) {
                 env->data.total_cells++;
             }
-            copy[(env->width * y) + x] = state; // Write next state onto the copy
+            env->_next_generation[(env->width * y) + x] = state; // Write next state onto the next generation grid
         }
     }
-    free(env->grid);
-    env->grid = copy;
+
+    // Swap current simulation grid for the next generation
+    bool *temp = env->grid;
+    env->grid = env->_next_generation;
+    env->_next_generation = temp;
 }
 
 /* MENU CONTROLS */

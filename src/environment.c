@@ -24,8 +24,12 @@ Environment *init_environment(unsigned int width, unsigned int height, unsigned 
     Environment *env = (Environment *) malloc(sizeof(Environment));
     assert(env != NULL);
 
+    // Create simulation grid and next generation grid
     env->grid = (bool *) malloc(sizeof(bool) * size);
     assert(env->grid != NULL);
+    env->_next_generation = (bool *) malloc(sizeof(bool) * size);
+    assert(env->_next_generation != NULL);
+
     env->height = height;
     env->width = width;
 
@@ -49,6 +53,7 @@ Environment *init_environment(unsigned int width, unsigned int height, unsigned 
  */
 void destroy_env(Environment *env) {
     free(env->grid);
+    free(env->_next_generation);
     free(env);
 }
 

@@ -22,6 +22,7 @@ typedef struct environment {
     unsigned int height;
     SimulationAnalytics data;
     bool *grid;
+    bool *_next_generation;
 } Environment;
 
 /* ENVIRONMENT MANAGEMENT */
