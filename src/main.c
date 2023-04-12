@@ -21,8 +21,8 @@ const char WINDOW_NAME[] = "Conway's Game of Life Analyzer";
 // Simulation parameters
 Palette const GAME_PALETTES[] = PALETTES;
 const unsigned int DEFAULT_FRAME_DELAY = 100;
-const unsigned int MAX_FRAME_DELAY = 2000;
-const unsigned int FRAME_DELAY_STEP = 25;
+const unsigned int MAX_FRAME_DELAY = 1000;
+const unsigned int FRAME_DELAY_STEP = 10;
 const unsigned int FONT_SIZE = 12;
 
 int main(int argc, char **argv) {
