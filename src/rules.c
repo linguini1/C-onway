@@ -9,6 +9,21 @@
 #include "rules.h"
 #include <stdlib.h>
 
+/* NUMBER KEY TO CELL TYPE MAPPING FOR SIMULATION SELECTION */
+// Each number key 0-9 maps directly to an index of this array.
+const CellType CELL_MAP[10] = {
+        ConwayCell,
+        ConwayCell,
+        LesseConwayCell,
+        VonNeumannR2ConwayCell,
+        TripleMooreConwayCell,
+        MazeCell,
+        FractalCornerCell,
+        FractalCell,
+        NoiseCell,
+        ConwayCell,
+};
+
 /* STATE CALCULATORS */
 
 /**
@@ -343,30 +358,12 @@ void next_generation(Environment *env, CellType *cell_type) {
  * @param cell_type A pointer to the current cell type variable being used by the game
  */
 void change_cell_type(CellType *cell_type, SDL_KeyCode key) {
-    switch (key) {
-        case SDLK_2:
-            *cell_type = (CellType) LesseConwayCell;
-            break;
-        case SDLK_3:
-            *cell_type = (CellType) VonNeumannR2ConwayCell;
-            break;
-        case SDLK_4:
-            *cell_type = (CellType) TripleMooreConwayCell;
-            break;
-        case SDLK_5:
-            *cell_type = (CellType) MazeCell;
-            break;
-        case SDLK_6:
-            *cell_type = (CellType) FractalCornerCell;
-            break;
-        case SDLK_7:
-            *cell_type = (CellType) FractalCell;
-            break;
-        case SDLK_8:
-            *cell_type = (CellType) NoiseCell;
-            break;
-        default:
-            *cell_type = (CellType) ConwayCell; // Also handles key 1
-            break;
-    }
+
+    // SDL2 uses chars 0-9 to represent keys 0-9.
+    // In UTF-8 encoding, 0-9 is represented by integers 48-57.
+    // Subtract 48 from SDL_Key to get the original digit.
+    // Use this index to map to the corresponding cell in the CELL_MAP constant.
+
+    unsigned short int index = (unsigned short int) key - 48;
+    *cell_type = CELL_MAP[index];
 }
