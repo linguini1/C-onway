@@ -21,7 +21,7 @@ const CellType CELL_MAP[10] = {
         FractalCornerCell,
         FractalCell,
         NoiseCell,
-        OrganicMazeCell,
+        ConwayCancerCell,
 };
 
 /* STATE CALCULATORS */
@@ -277,7 +277,7 @@ bool von_neumann_r2_conway_next_state(Environment const *env, unsigned int x, un
  * @param y The y coordinate of the current cell
  * @return The next state of the cell (true for alive, false for dead)
  */
-bool organic_maze_next_state(Environment const *env, unsigned int x, unsigned int y) {
+bool conway_cancer_next_state(Environment const *env, unsigned int x, unsigned int y) {
     unsigned int neighbours = num_neighbours(env, x, y, &VON_NEUMANN_R2);
     bool alive = access(env, x, y);
 
