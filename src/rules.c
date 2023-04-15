@@ -269,6 +269,9 @@ bool von_neumann_r2_conway_next_state(Environment const *env, unsigned int x, un
 
 /**
  * Calculates the next state for the cell at (x, y) to create a more organic maze shape.
+ * Note: This pattern seems to occur if the original COGL rules are scaled to a larger neighbourhood. Cells begin to
+ * grow uncontrollably. All other COGL variations included in this simulation have an additional control factor added,
+ * like also considering the number of neighbours in another smaller neighbourhood.
  * @param env The environment that holds the simulation
  * @param x The x coordinate of the current cell
  * @param y The y coordinate of the current cell
