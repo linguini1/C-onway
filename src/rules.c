@@ -21,7 +21,7 @@ const CellType CELL_MAP[10] = {
         FractalCornerCell,
         FractalCell,
         NoiseCell,
-        ConwayCell,
+        OrganicMazeCell,
 };
 
 /* STATE CALCULATORS */
@@ -365,5 +365,11 @@ void change_cell_type(CellType *cell_type, SDL_KeyCode key) {
     // Use this index to map to the corresponding cell in the CELL_MAP constant.
 
     unsigned short int index = (unsigned short int) key - 48;
+
+    // Prevent exceeding array length
+    if (index < 0 || index > 9) {
+        return;
+    }
+
     *cell_type = CELL_MAP[index];
 }
