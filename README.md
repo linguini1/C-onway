@@ -1,8 +1,8 @@
 # C-onway's Game of Life
 ### Matteo Golin
 
-A real-time Conway's Game of Life simulation written in C for better performance. The simulation comes with
-variable colours, starting seeds and real-time simulation analytics.
+A real-time Conway's Game of Life simulation written in C for high performance. Includes theme selection, speed 
+controls, different cell types, real-time analytics, interactive simulation setup and more.
 
 https://github.com/linguini1/C-onway/assets/62850091/0c45270b-0b4e-4be8-9484-daa16b1e5e10
 
