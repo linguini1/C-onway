@@ -4,7 +4,7 @@
 A real-time Conway's Game of Life simulation written in C for better performance. The simulation comes with
 variable colours, starting seeds and real-time simulation analytics.
 
-[!Trailer](./docs/C-onway.mp4)
+![Trailer](./docs/C-onway.mp4)
 
 ## Installation
 No installation required, just run `conway.exe`.
