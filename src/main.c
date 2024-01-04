@@ -10,6 +10,9 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+// Font path
+#define FONT_PATH "./src/uni0553.ttf"
+
 // Constants
 const unsigned int DEFAULT_SCALE = 6;
 const unsigned int MAX_SCALE = 14;
@@ -24,7 +27,7 @@ const Palette GAME_PALETTES[] = {Casio,   MonitorGlow, Nokia3310, EndGame,   Pap
 const unsigned int DEFAULT_FRAME_DELAY = 100;
 const unsigned int MAX_FRAME_DELAY = 1000;
 const unsigned int FRAME_DELAY_STEP = 10;
-const unsigned int FONT_SIZE = 12;
+#define FONT_SIZE 12
 
 int main(void) {
 
@@ -61,14 +64,14 @@ int main(void) {
     int x_offset = 0;
     int y_offset = 0;
 
-    // Create renderer
+    // Create enderer
     SDL_Renderer *renderer = SDL_CreateRenderer(
         window, -1,
         SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC // Accelerated and in sync with monitor refresh rate
     );
 
     // Load font
-    TTF_Font *font = TTF_OpenFont("./src/uni0553.ttf", (int)FONT_SIZE); // TODO fix path
+    TTF_Font *font = TTF_OpenFont(FONT_PATH, FONT_SIZE); // TODO fix path
     if (font == NULL) {
         printf("Font could not be loaded.");
         return EXIT_FAILURE;
