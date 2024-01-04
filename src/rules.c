@@ -27,7 +27,7 @@ const CellType CELL_MAP[10] = {
  */
 bool conway_next_state(Environment const *env, unsigned int x, unsigned int y) {
     unsigned int neighbours = num_neighbours(env, x, y, &MOORE);
-    bool alive = access(env, x, y);
+    bool alive = env_access(env, x, y);
 
     // If a cell is alive:
     if (alive) {
@@ -55,7 +55,7 @@ bool conway_next_state(Environment const *env, unsigned int x, unsigned int y) {
  * @return The next state of the cell (true for alive, false for dead)
  */
 bool maze_next_state(Environment const *env, unsigned int x, unsigned int y) {
-    bool alive = access(env, x, y);
+    bool alive = env_access(env, x, y);
     unsigned int neighbours = num_neighbours(env, x, y, &MOORE);
 
     // If already alive
@@ -79,7 +79,7 @@ bool maze_next_state(Environment const *env, unsigned int x, unsigned int y) {
  * @return The next state of the cell (true for alive, false for dead)
  */
 bool noise_next_state(Environment const *env, unsigned int x, unsigned int y) {
-    bool alive = access(env, x, y);
+    bool alive = env_access(env, x, y);
     unsigned int neighbours = num_neighbours(env, x, y, &MOORE);
 
     // If already alive
@@ -104,7 +104,7 @@ bool noise_next_state(Environment const *env, unsigned int x, unsigned int y) {
  * @return The next state of the cell (true for alive, false for dead)
  */
 bool fractal_next_state(Environment const *env, unsigned int x, unsigned int y) {
-    bool alive = access(env, x, y);
+    bool alive = env_access(env, x, y);
     unsigned int neighbours = num_neighbours(env, x, y, &VON_NEUMANN);
 
     // If already alive
@@ -129,7 +129,7 @@ bool fractal_next_state(Environment const *env, unsigned int x, unsigned int y) 
  * @return The next state of the cell (true for alive, false for dead)
  */
 bool fractal_corner_next_state(Environment const *env, unsigned int x, unsigned int y) {
-    bool alive = access(env, x, y);
+    bool alive = env_access(env, x, y);
     unsigned int neighbours = num_neighbours(env, x, y, &VON_NEUMANN_CORNERS);
 
     // If already alive
@@ -155,7 +155,7 @@ bool fractal_corner_next_state(Environment const *env, unsigned int x, unsigned 
  */
 bool lesse_conway_next_state(Environment const *env, unsigned int x, unsigned int y) {
     unsigned int neighbours = num_neighbours(env, x, y, &LESSE);
-    bool alive = access(env, x, y);
+    bool alive = env_access(env, x, y);
 
     // If a cell is alive:
     if (alive) {
@@ -184,7 +184,7 @@ bool lesse_conway_next_state(Environment const *env, unsigned int x, unsigned in
  */
 bool triple_moore_conway_next_state(Environment const *env, unsigned int x, unsigned int y) {
 
-    bool alive = access(env, x, y);
+    bool alive = env_access(env, x, y);
     bool *neighbour_vector = neighbours(env, x, y, &TRIPLE_MOORE); // Determine neighbours
 
     // The first eight neighbours
@@ -227,7 +227,7 @@ bool triple_moore_conway_next_state(Environment const *env, unsigned int x, unsi
  */
 bool von_neumann_r2_conway_next_state(Environment const *env, unsigned int x, unsigned int y) {
 
-    bool alive = access(env, x, y);
+    bool alive = env_access(env, x, y);
     bool *neighbour_vector = neighbours(env, x, y, &VON_NEUMANN_R2); // Determine neighbours
 
     // The first four neighbours
@@ -271,7 +271,7 @@ bool von_neumann_r2_conway_next_state(Environment const *env, unsigned int x, un
  */
 bool conway_cancer_next_state(Environment const *env, unsigned int x, unsigned int y) {
     unsigned int neighbours = num_neighbours(env, x, y, &VON_NEUMANN_R2);
-    bool alive = access(env, x, y);
+    bool alive = env_access(env, x, y);
 
     // If a cell is alive:
     if (alive) {
@@ -301,9 +301,9 @@ bool conway_cancer_next_state(Environment const *env, unsigned int x, unsigned i
 void populate_analytics_string(char **string, Environment const *env, CellType *cell_type) {
 
     SimulationAnalytics data = env->data;
-    float percent_alive = ((float)(data.total_cells) / (float)(env->width * env->height)) * 100.0f;
-    float initial_cells = data.initial_cells == 0 ? 1.0f : (float)data.initial_cells;
-    float growth = ((float)data.total_cells / initial_cells) * 100.0f;
+    double percent_alive = ((double)(data.total_cells) / (double)(env->width * env->height)) * 100.0;
+    double initial_cells = data.initial_cells == 0 ? 1.0 : (double)data.initial_cells;
+    double growth = ((double)data.total_cells / initial_cells) * 100.0;
 
     asprintf(string,
              "cell type: %s\ngenerations: %llu\ninitial cells: %u\ncells: %lu\npercentage alive: %.3f%%\ngrowth: "
@@ -323,8 +323,8 @@ void next_generation(Environment *env, CellType *cell_type) {
     env->data.generations++;   // Increase generations
 
     // Update the next generation with all the new states
-    for (int x = 0; x < env->width; x++) {
-        for (int y = 0; y < env->height; y++) {
+    for (unsigned int x = 0; x < env->width; x++) {
+        for (unsigned int y = 0; y < env->height; y++) {
             bool state = cell_type->calculator(env, x, y);
 
             // Increase cell total
@@ -356,7 +356,7 @@ void change_cell_type(CellType *cell_type, SDL_KeyCode key) {
     unsigned short int index = (unsigned short int)key - 48;
 
     // Prevent exceeding array length
-    if (index < 0 || index > 9) {
+    if (index > 9) {
         return;
     }
 

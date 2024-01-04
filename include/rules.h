@@ -16,7 +16,7 @@
 typedef bool (*StateCalculator)(Environment const *, unsigned int, unsigned int);
 
 typedef struct cell_type {
-    char *name;
+    const char *name;
     StateCalculator calculator;
 } CellType;
 

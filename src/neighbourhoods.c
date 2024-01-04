@@ -36,7 +36,7 @@ Coordinate translate(Coordinate coord, int x, int y) { return (Coordinate){coord
  * @param y The y amount to translate all coordinates by
  */
 void translate_coordinates(Coordinate *coords, unsigned int len, int x, int y) {
-    for (int i = 0; i < len; i++) {
+    for (unsigned int i = 0; i < len; i++) {
         coords[i] = translate(coords[i], x, y);
     }
 }
@@ -49,16 +49,16 @@ void translate_coordinates(Coordinate *coords, unsigned int len, int x, int y) {
  */
 Coordinate wrap(Environment const *env, Coordinate coord) {
     if (coord.x < 0) {
-        coord.x += (int)env->width;
+        coord.x += env->width;
     }
-    if (coord.x >= env->width) {
-        coord.x -= (int)env->width;
+    if ((unsigned int)coord.x >= env->width) {
+        coord.x -= env->width;
     }
     if (coord.y < 0) {
-        coord.y += (int)env->height;
+        coord.y += env->height;
     }
-    if (coord.y >= env->height) {
-        coord.y -= (int)env->height;
+    if ((unsigned int)coord.y >= env->height) {
+        coord.y -= env->height;
     }
     return coord;
 }
@@ -89,7 +89,7 @@ bool *neighbours(Environment const *env, unsigned int x, unsigned int y, Neighbo
         neighbour = wrap(env, neighbour); // If neighbour out of bounds, wrap around
 
         // Store states
-        neighbour_states[i] = access(env, neighbour.x, neighbour.y);
+        neighbour_states[i] = env_access(env, neighbour.x, neighbour.y);
     }
     return neighbour_states;
 }

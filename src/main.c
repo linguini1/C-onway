@@ -19,13 +19,14 @@ const float FONT_SCALE = 1.8f;
 const char WINDOW_NAME[] = "Conway's Game of Life Analyzer";
 
 // Simulation parameters
-Palette const GAME_PALETTES[] = PALETTES;
+const Palette GAME_PALETTES[] = {Casio,   MonitorGlow, Nokia3310, EndGame,   PaperAndDust,
+                                 IBM8503, OngBit,      PaperBack, IronBlues, SpriteZero};
 const unsigned int DEFAULT_FRAME_DELAY = 100;
 const unsigned int MAX_FRAME_DELAY = 1000;
 const unsigned int FRAME_DELAY_STEP = 10;
 const unsigned int FONT_SIZE = 12;
 
-int main(int argc, char **argv) {
+int main(void) {
 
     // OpenGL params
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -67,7 +68,7 @@ int main(int argc, char **argv) {
     );
 
     // Load font
-    TTF_Font *font = TTF_OpenFont("../src/uni0553.ttf", (int)FONT_SIZE); // TODO fix path
+    TTF_Font *font = TTF_OpenFont("./src/uni0553.ttf", (int)FONT_SIZE); // TODO fix path
     if (font == NULL) {
         printf("Font could not be loaded.");
         return EXIT_FAILURE;
@@ -83,7 +84,7 @@ int main(int argc, char **argv) {
     SDL_Event event;                                // For capturing events
 
     // Simulation assets
-    Environment *environment = init_environment(game_width, game_height, DEFAULT_FRAME_DELAY);
+    Environment *environment = env_init(game_width, game_height, DEFAULT_FRAME_DELAY);
     CellType cell_type = ConwayCell;
     char *analytics_string;         // String for analytics text
     short unsigned int palette = 0; // Controls game palette
@@ -101,8 +102,6 @@ int main(int argc, char **argv) {
             // Keypress events
             if (event.type == SDL_KEYDOWN) {
                 SDL_KeyCode key = event.key.keysym.sym;
-                unsigned int current_width = initial_display_mode.w / (DEFAULT_SCALE + zoom);
-                unsigned int current_height = initial_display_mode.h / (DEFAULT_SCALE + zoom);
 
                 // Pause & play
                 if (key == SDLK_SPACE) {
@@ -132,7 +131,7 @@ int main(int argc, char **argv) {
                 }
                 // Clear simulation
                 else if (key == SDLK_c) {
-                    clear_env(environment);
+                    env_clear(environment);
                 }
                 // Cycle through themes
                 else if (key == SDLK_t) {
@@ -146,14 +145,14 @@ int main(int argc, char **argv) {
                 unsigned int y = event.motion.y / (unsigned int)(DEFAULT_SCALE + zoom) - y_offset;
 
                 // Coordinates must be within boundaries, otherwise the action will be ignored
-                if (in_bounds(environment, x, y)) {
-                    selected_state = !access(environment, x, y);
+                if (env_in_bounds(environment, x, y)) {
+                    selected_state = !env_access(environment, x, y);
                     if (selected_state) {
                         environment->data.initial_cells++; // These are not natural cells, so they should be registered
                     } else if (environment->data.initial_cells - 1 > 0) {
                         environment->data.initial_cells--; // A cell has been removed
                     }
-                    write(environment, x, y, selected_state); // Toggle cell state at click
+                    env_write(environment, x, y, selected_state); // Toggle cell state at click
                 }
             }
 
@@ -162,13 +161,13 @@ int main(int argc, char **argv) {
                 unsigned int y = event.motion.y / (unsigned int)(DEFAULT_SCALE + zoom) - y_offset;
 
                 // Coordinates must be within boundaries, otherwise the action will be ignored
-                if (in_bounds(environment, x, y)) {
+                if (env_in_bounds(environment, x, y)) {
                     if (selected_state) {
                         environment->data.initial_cells++; // These are not natural cells, so they should be registered
                     } else if (environment->data.initial_cells - 1 > 0) {
                         environment->data.initial_cells--; // A cell has been removed
                     }
-                    write(environment, x, y, selected_state); // Toggle cell state at click
+                    env_write(environment, x, y, selected_state); // Toggle cell state at click
                 }
             }
 
@@ -189,9 +188,9 @@ int main(int argc, char **argv) {
         set_draw_colour(renderer, &GAME_PALETTES[palette], dark_mode); // Living cell colour
 
         // Draw cells
-        for (int x = 0; x < game_width; x++) {
-            for (int y = 0; y < game_height; y++) {
-                if (access(environment, x, y) == true) {
+        for (unsigned int x = 0; x < game_width; x++) {
+            for (unsigned int y = 0; y < game_height; y++) {
+                if (env_access(environment, x, y) == true) {
                     SDL_RenderDrawPoint(renderer, x + x_offset, y + y_offset); // Allows arrow key movement
                 }
             }
@@ -232,7 +231,7 @@ int main(int argc, char **argv) {
     }
 
     // Release simulation assets
-    destroy_env(environment);
+    env_destroy(environment);
     TTF_CloseFont(font);
 
     // Release resources
@@ -241,5 +240,5 @@ int main(int argc, char **argv) {
     TTF_Quit();
     SDL_Quit();
 
-    return 0;
+    return EXIT_SUCCESS;
 }

@@ -27,17 +27,17 @@ typedef struct environment {
 } Environment;
 
 /* ENVIRONMENT MANAGEMENT */
-Environment *init_environment(unsigned int width, unsigned int height, unsigned int generation_speed);
+Environment *env_init(unsigned int width, unsigned int height, unsigned int generation_speed);
 
-void destroy_env(Environment *env);
+void env_destroy(Environment *env);
 
-void clear_env(Environment *env);
+void env_clear(Environment *env);
 
 /* ENVIRONMENT ACCESS & MANIPULATION */
-bool access(Environment const *env, unsigned int x, unsigned int y);
+bool env_access(Environment const *env, unsigned int x, unsigned int y);
 
-void write(Environment *env, unsigned int x, unsigned int y, bool value);
+void env_write(Environment *env, unsigned int x, unsigned int y, bool value);
 
-bool in_bounds(Environment const *env, unsigned int x, unsigned int y);
+bool env_in_bounds(Environment const *env, unsigned int x, unsigned int y);
 
 #endif // CONWAY_ENVIRONMENT_H

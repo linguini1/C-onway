@@ -19,7 +19,6 @@ WARNINGS += -Wdisabled-optimization -Wsuggest-attribute=const
 
 ### COMPILER FLAGS ###
 CFLAGS += $(OPTIMIZATION)
-all: CFLAGS += $(shell sdl2-config --cflags)
 all: CFLAGS += $(shell sdl2-config --cflags --libs)
 all: CFLAGS += -lSDL2_ttf
 

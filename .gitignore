@@ -7,3 +7,4 @@ conway
 # Debug & development
 compile_commands.json
 vgcore*
+.cache

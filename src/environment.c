@@ -18,7 +18,7 @@
  * @param height The height of the environment
  * @return a flattened 2D array of booleans representing the environment
  */
-Environment *init_environment(unsigned int width, unsigned int height, unsigned int generation_speed) {
+Environment *env_init(unsigned int width, unsigned int height, unsigned int generation_speed) {
 
     unsigned int size = width * height;
 
@@ -36,7 +36,7 @@ Environment *init_environment(unsigned int width, unsigned int height, unsigned 
     env->width = width;
 
     // Create simulation grid
-    for (int i = 0; i < size; i++) {
+    for (unsigned int i = 0; i < size; i++) {
         env->grid[i] = false; // All values initialized to false
     }
 
@@ -53,7 +53,7 @@ Environment *init_environment(unsigned int width, unsigned int height, unsigned 
  * Destroys an Environment struct.
  * @param env the environment to be freed.
  */
-void destroy_env(Environment *env) {
+void env_destroy(Environment *env) {
     free(env->grid);
     free(env->_next_generation);
     free(env);
@@ -63,7 +63,7 @@ void destroy_env(Environment *env) {
  * Clear all cells from the simulation grid.
  * @param env The simulation environment to be cleared.
  */
-void clear_env(Environment *env) {
+void env_clear(Environment *env) {
     unsigned int size = env->width * env->height;
     for (unsigned int i = 0; i < size; i++) {
         env->grid[i] = false;
@@ -84,8 +84,8 @@ void clear_env(Environment *env) {
  * @param y The y coordinate of the desired cell
  * @return
  */
-bool access(Environment const *env, unsigned int x, unsigned int y) {
-    assert(in_bounds(env, x, y));            // Assert x, y in bounds
+bool env_access(Environment const *env, unsigned int x, unsigned int y) {
+    assert(env_in_bounds(env, x, y));        // Assert x, y in bounds
     unsigned int i = ((env->width) * y) + x; // Calculate index
     return env->grid[i];
 }
@@ -97,8 +97,8 @@ bool access(Environment const *env, unsigned int x, unsigned int y) {
  * @param y The y coordinate of the location to be modified
  * @param value The value to be written to the (x, y) location
  */
-void write(Environment *env, unsigned int x, unsigned int y, bool value) {
-    assert(in_bounds(env, x, y));            // Assert x, y in bounds
+void env_write(Environment *env, unsigned int x, unsigned int y, bool value) {
+    assert(env_in_bounds(env, x, y));        // Assert x, y in bounds
     unsigned int i = ((env->width) * y) + x; // Calculate index
     env->grid[i] = value;
 }
@@ -110,7 +110,7 @@ void write(Environment *env, unsigned int x, unsigned int y, bool value) {
  * @param y The y coordinate to be checked
  * @return true if (x, y) are within bounds, false otherwise
  */
-bool in_bounds(Environment const *env, unsigned int x, unsigned int y) {
+bool env_in_bounds(Environment const *env, unsigned int x, unsigned int y) {
     unsigned int index = env->width * y + x;
     if (index < env->width * env->height) {
         return true;
