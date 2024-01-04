@@ -11,7 +11,9 @@
 #include <stdio.h>
 
 // Font path
-#define FONT_PATH "./src/uni0553.ttf"
+#ifndef FONT_PATH
+#error "FONT_PATH not defined with the path to a ttf font. See README."
+#endif // FONT_PATH
 
 // Constants
 const unsigned int DEFAULT_SCALE = 6;
@@ -71,7 +73,7 @@ int main(void) {
     );
 
     // Load font
-    TTF_Font *font = TTF_OpenFont(FONT_PATH, FONT_SIZE); // TODO fix path
+    TTF_Font *font = TTF_OpenFont(FONT_PATH, FONT_SIZE);
     if (font == NULL) {
         printf("Font could not be loaded.");
         return EXIT_FAILURE;

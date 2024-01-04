@@ -38,3 +38,24 @@ Run the executable and interact with the live simulation windows with the contro
 
 Building has currently only been tested on (Arch) Linux. Simply run `make all` to compile the entire program and link it
 with the SDL2 and SDL2_ttf libraries.
+
+### Fonts
+
+The default TTF font used for this program is included in the `src/` directory. However, you may also provide your own
+TTF font if you prefer.
+
+Compiling by hand, you must simply define `FONT_PATH` as a string containing the path to your TTF font:
+
+```console
+gcc ...<cflags>... -o main.o -c main.c -DFONT_PATH='"/path/to/font"'
+```
+
+Compiling without `FONT_PATH` defined will provide a compile error.
+
+To change the path to something other than the default TTF font, you may call:
+
+```console
+make all FONT_PATH=path/to/font
+```
+
+The quotations required to make the path a C-string will be added for you.

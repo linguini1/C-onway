@@ -2,7 +2,7 @@ CC = gcc
 OUT = conway
 
 ### COMPILER OPTIONS ###
-OPTIMIZATION = -O2
+OPTIMIZATION = -O3
 
 ### WARNINGS ###
 # (see https://gcc.gnu.org/onlinedocs/gcc-6.3.0/gcc/Warning-Options.html)
@@ -26,6 +26,11 @@ all: CFLAGS += -lSDL2_ttf
 SRCDIR = src
 SRC_FILES = $(wildcard $(SRCDIR)/*.c)
 OBJ_FILES = $(patsubst %.c,%.o,$(SRC_FILES))
+
+### Font for text rendering ###
+FONT_PATH = ./src/uni0553.ttf
+FONT_DEFINE = -DFONT_PATH='"$(FONT_PATH)"'
+CFLAGS += $(FONT_DEFINE)
 
 %.o: %.c
 	$(CC) $(CFLAGS) $(WARNINGS) -o $@ -c $<
