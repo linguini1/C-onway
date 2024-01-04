@@ -1,16 +1,16 @@
 /**
-* Contains rules for determining cell state, various cell types and logic for updating the simulation
+ * Contains rules for determining cell state, various cell types and logic for updating the simulation
  * environment using those rules.
  * @author Matteo Golin
  * @version 1.0
-*/
+ */
 
 #ifndef CONWAY_RULES_H
 #define CONWAY_RULES_H
 
 #include "environment.h"
 #include "neighbourhoods.h"
-#include <SDL.h>
+#include <SDL2/SDL.h>
 
 /* CUSTOM TYPES */
 typedef bool (*StateCalculator)(Environment const *, unsigned int, unsigned int);
@@ -40,15 +40,24 @@ bool conway_cancer_next_state(Environment const *env, unsigned int x, unsigned i
 bool von_neumann_r2_conway_next_state(Environment const *env, unsigned int x, unsigned int y);
 
 /* CELL TYPES */
-#define ConwayCell {"conway cell", conway_next_state}
-#define MazeCell {"maze cell", maze_next_state}
-#define NoiseCell {"noise cell", noise_next_state}
-#define FractalCell {"fractal cell", fractal_next_state}
-#define FractalCornerCell {"fractal corner cell", fractal_corner_next_state}
-#define LesseConwayCell {"lesse conway cell", lesse_conway_next_state}
-#define TripleMooreConwayCell {"triple moore conway cell", triple_moore_conway_next_state}
-#define VonNeumannR2ConwayCell {"von neumann r2 conway cell", von_neumann_r2_conway_next_state}
-#define ConwayCancerCell {"conway cancer cell", conway_cancer_next_state}
+#define ConwayCell                                                                                                     \
+    { "conway cell", conway_next_state }
+#define MazeCell                                                                                                       \
+    { "maze cell", maze_next_state }
+#define NoiseCell                                                                                                      \
+    { "noise cell", noise_next_state }
+#define FractalCell                                                                                                    \
+    { "fractal cell", fractal_next_state }
+#define FractalCornerCell                                                                                              \
+    { "fractal corner cell", fractal_corner_next_state }
+#define LesseConwayCell                                                                                                \
+    { "lesse conway cell", lesse_conway_next_state }
+#define TripleMooreConwayCell                                                                                          \
+    { "triple moore conway cell", triple_moore_conway_next_state }
+#define VonNeumannR2ConwayCell                                                                                         \
+    { "von neumann r2 conway cell", von_neumann_r2_conway_next_state }
+#define ConwayCancerCell                                                                                               \
+    { "conway cancer cell", conway_cancer_next_state }
 
 /* NUMBER KEY TO CELL TYPE MAPPING FOR SIMULATION SELECTION */
 extern const CellType CELL_MAP[];

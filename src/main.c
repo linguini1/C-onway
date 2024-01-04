@@ -3,12 +3,12 @@
  * @author Matteo Golin
  * @version 1.1
  */
-#include "palettes.h"
-#include "rules.h"
-#include <stdio.h>
-#include <stdbool.h>
-#include <SDL.h>
+#include "../include/palettes.h"
+#include "../include/rules.h"
+#include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <stdbool.h>
+#include <stdio.h>
 
 // Constants
 const unsigned int DEFAULT_SCALE = 6;
@@ -49,32 +49,25 @@ int main(int argc, char **argv) {
     SDL_GetCurrentDisplayMode(0, &initial_display_mode); // Get the current window size
 
     // Create window
-    SDL_Window *window = SDL_CreateWindow(
-            WINDOW_NAME,
-            SDL_WINDOWPOS_UNDEFINED,
-            SDL_WINDOWPOS_UNDEFINED,
-            initial_display_mode.w,
-            initial_display_mode.h,
-            SDL_WINDOW_OPENGL
-    );
+    SDL_Window *window = SDL_CreateWindow(WINDOW_NAME, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+                                          initial_display_mode.w, initial_display_mode.h, SDL_WINDOW_OPENGL);
     SDL_SetWindowResizable(window, true); // Window should be resizable
 
     // Determine simulation size from window size
-    unsigned int game_width = initial_display_mode.w / (unsigned int) DEFAULT_SCALE;
-    unsigned int game_height = initial_display_mode.h / (unsigned int) DEFAULT_SCALE;
+    unsigned int game_width = initial_display_mode.w / (unsigned int)DEFAULT_SCALE;
+    unsigned int game_height = initial_display_mode.h / (unsigned int)DEFAULT_SCALE;
     unsigned int zoom = 0; // No zoom by default
     int x_offset = 0;
     int y_offset = 0;
 
     // Create renderer
     SDL_Renderer *renderer = SDL_CreateRenderer(
-            window,
-            -1,
-            SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC // Accelerated and in sync with monitor refresh rate
+        window, -1,
+        SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC // Accelerated and in sync with monitor refresh rate
     );
 
     // Load font
-    TTF_Font *font = TTF_OpenFont("../src/uni0553.ttf", (int) FONT_SIZE); // TODO fix path
+    TTF_Font *font = TTF_OpenFont("../src/uni0553.ttf", (int)FONT_SIZE); // TODO fix path
     if (font == NULL) {
         printf("Font could not be loaded.");
         return EXIT_FAILURE;
@@ -82,17 +75,17 @@ int main(int argc, char **argv) {
 
     // Runtime variables
     unsigned int generation_timer = SDL_GetTicks(); // Slow generations without slowing animation
-    bool running = true; // For quitting the animation
-    bool playing = false; // For play and pause
-    bool dark_mode = true; // Simulation runs in dark mode
-    bool analytics_on = true; // Shows analytics by default
-    bool selected_state = false; // For drawing a cohesive line on drag
-    SDL_Event event; // For capturing events
+    bool running = true;                            // For quitting the animation
+    bool playing = false;                           // For play and pause
+    bool dark_mode = true;                          // Simulation runs in dark mode
+    bool analytics_on = true;                       // Shows analytics by default
+    bool selected_state = false;                    // For drawing a cohesive line on drag
+    SDL_Event event;                                // For capturing events
 
     // Simulation assets
     Environment *environment = init_environment(game_width, game_height, DEFAULT_FRAME_DELAY);
     CellType cell_type = ConwayCell;
-    char *analytics_string; // String for analytics text
+    char *analytics_string;         // String for analytics text
     short unsigned int palette = 0; // Controls game palette
 
     while (running) {
@@ -115,7 +108,7 @@ int main(int argc, char **argv) {
                 if (key == SDLK_SPACE) {
                     playing = !playing;
                 }
-                    // Speed controls
+                // Speed controls
                 else if ((key == SDLK_MINUS || key == SDLK_KP_MINUS) &&
                          environment->data.generation_speed <= MAX_FRAME_DELAY - FRAME_DELAY_STEP) {
                     environment->data.generation_speed += FRAME_DELAY_STEP; // Slow down
@@ -123,25 +116,25 @@ int main(int argc, char **argv) {
                            environment->data.generation_speed >= FRAME_DELAY_STEP) {
                     environment->data.generation_speed -= FRAME_DELAY_STEP; // Speed up
                 } else if (key == SDLK_m) {
-                    environment->data.generation_speed = 0;  // Max speed
+                    environment->data.generation_speed = 0; // Max speed
                 }
-                    // Switch cell types (keys between 0-9)
+                // Switch cell types (keys between 0-9)
                 else if (0x30 <= key && key <= 0x39) {
                     change_cell_type(&cell_type, key);
                 }
-                    // Toggle dark mode
+                // Toggle dark mode
                 else if (key == SDLK_d) {
                     dark_mode = !dark_mode;
                 }
-                    // Toggle analytics
+                // Toggle analytics
                 else if (key == SDLK_a) {
                     analytics_on = !analytics_on;
                 }
-                    // Clear simulation
+                // Clear simulation
                 else if (key == SDLK_c) {
                     clear_env(environment);
                 }
-                    // Cycle through themes
+                // Cycle through themes
                 else if (key == SDLK_t) {
                     palette = (palette + 1) % NUM_PALETTES;
                 }
@@ -149,8 +142,8 @@ int main(int argc, char **argv) {
 
             // Mouse click or click and drag
             if (event.type == SDL_MOUSEBUTTONDOWN) {
-                unsigned int x = event.motion.x / (unsigned int) (DEFAULT_SCALE + zoom) - x_offset;
-                unsigned int y = event.motion.y / (unsigned int) (DEFAULT_SCALE + zoom) - y_offset;
+                unsigned int x = event.motion.x / (unsigned int)(DEFAULT_SCALE + zoom) - x_offset;
+                unsigned int y = event.motion.y / (unsigned int)(DEFAULT_SCALE + zoom) - y_offset;
 
                 // Coordinates must be within boundaries, otherwise the action will be ignored
                 if (in_bounds(environment, x, y)) {
@@ -165,8 +158,8 @@ int main(int argc, char **argv) {
             }
 
             if (event.type == SDL_MOUSEMOTION && event.motion.state) {
-                unsigned int x = event.motion.x / (unsigned int) (DEFAULT_SCALE + zoom) - x_offset;
-                unsigned int y = event.motion.y / (unsigned int) (DEFAULT_SCALE + zoom) - y_offset;
+                unsigned int x = event.motion.x / (unsigned int)(DEFAULT_SCALE + zoom) - x_offset;
+                unsigned int y = event.motion.y / (unsigned int)(DEFAULT_SCALE + zoom) - y_offset;
 
                 // Coordinates must be within boundaries, otherwise the action will be ignored
                 if (in_bounds(environment, x, y)) {
@@ -190,8 +183,8 @@ int main(int argc, char **argv) {
         }
 
         // Clear screen
-        SDL_RenderSetScale(renderer, (float) (DEFAULT_SCALE + zoom), (float) (DEFAULT_SCALE + zoom)); // Scale for cells
-        set_draw_colour(renderer, &GAME_PALETTES[palette], !dark_mode); // Dead cell colour
+        SDL_RenderSetScale(renderer, (float)(DEFAULT_SCALE + zoom), (float)(DEFAULT_SCALE + zoom)); // Scale for cells
+        set_draw_colour(renderer, &GAME_PALETTES[palette], !dark_mode);                             // Dead cell colour
         SDL_RenderClear(renderer);
         set_draw_colour(renderer, &GAME_PALETTES[palette], dark_mode); // Living cell colour
 
@@ -209,10 +202,9 @@ int main(int argc, char **argv) {
         SDL_DisplayMode display_mode;
         SDL_GetCurrentDisplayMode(0, &display_mode); // Get current width and height for text wrapping
         SDL_Surface *analytics_surface = TTF_RenderText_Solid_Wrapped(
-                font,
-                analytics_string,
-                dark_mode ? GAME_PALETTES[palette].light : GAME_PALETTES[palette].dark, // Switch colour with toggle
-                display_mode.w  // Wrap on \n or when width is larger than window width
+            font, analytics_string,
+            dark_mode ? GAME_PALETTES[palette].light : GAME_PALETTES[palette].dark, // Switch colour with toggle
+            display_mode.w // Wrap on \n or when width is larger than window width
         );
         // Display text in top left corner
         SDL_Texture *analytics_texture = SDL_CreateTextureFromSurface(renderer, analytics_surface);

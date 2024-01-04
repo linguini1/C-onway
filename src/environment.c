@@ -1,17 +1,19 @@
 /**
- * Contains logic for creating and manipulating the simulation environment, along with simulation analytics.
+ * Contains logic for creating and manipulating the simulation environment,
+ * along with simulation analytics.
  * @author Matteo Golin
  * @version 1.0
  */
 
-#include "environment.h"
-#include <stdlib.h>
+#include "../include/environment.h"
 #include <assert.h>
+#include <stdlib.h>
 
 /* ENVIRONMENT MANAGEMENT */
 
 /**
- * Create the Environment (grid) for cell growth to occur in, starting with all dead cells.
+ * Create the Environment (grid) for cell growth to occur in, starting with all
+ * dead cells.
  * @param width The width of the environment
  * @param height The height of the environment
  * @return a flattened 2D array of booleans representing the environment
@@ -21,13 +23,13 @@ Environment *init_environment(unsigned int width, unsigned int height, unsigned 
     unsigned int size = width * height;
 
     // Create environment
-    Environment *env = (Environment *) malloc(sizeof(Environment));
+    Environment *env = (Environment *)malloc(sizeof(Environment));
     assert(env != NULL);
 
     // Create simulation grid and next generation grid
-    env->grid = (bool *) malloc(sizeof(bool) * size);
+    env->grid = (bool *)malloc(sizeof(bool) * size);
     assert(env->grid != NULL);
-    env->_next_generation = (bool *) malloc(sizeof(bool) * size);
+    env->_next_generation = (bool *)malloc(sizeof(bool) * size);
     assert(env->_next_generation != NULL);
 
     env->height = height;
@@ -83,7 +85,7 @@ void clear_env(Environment *env) {
  * @return
  */
 bool access(Environment const *env, unsigned int x, unsigned int y) {
-    assert(in_bounds(env, x, y)); // Assert x, y in bounds
+    assert(in_bounds(env, x, y));            // Assert x, y in bounds
     unsigned int i = ((env->width) * y) + x; // Calculate index
     return env->grid[i];
 }
@@ -96,7 +98,7 @@ bool access(Environment const *env, unsigned int x, unsigned int y) {
  * @param value The value to be written to the (x, y) location
  */
 void write(Environment *env, unsigned int x, unsigned int y, bool value) {
-    assert(in_bounds(env, x, y)); // Assert x, y in bounds
+    assert(in_bounds(env, x, y));            // Assert x, y in bounds
     unsigned int i = ((env->width) * y) + x; // Calculate index
     env->grid[i] = value;
 }

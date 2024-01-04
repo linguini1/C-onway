@@ -1,6 +1,7 @@
 /**
- * asprintf for safe string formatting. Taken from this StackOverflow post because I did not want to write this from
- * scratch: https://stackoverflow.com/a/49873938/14833400
+ * asprintf for safe string formatting. Taken from this StackOverflow post
+ * because I did not want to write this from scratch:
+ * https://stackoverflow.com/a/49873938/14833400
  */
 #ifndef ASPRINTF_H
 #define ASPRINTF_H
@@ -9,9 +10,9 @@
 #define _GNU_SOURCE /* needed for (v)asprintf, affects '#include <stdio.h>' */
 #endif
 
+#include <stdarg.h> /* needed for va_*         */
 #include <stdio.h>  /* needed for vsnprintf    */
 #include <stdlib.h> /* needed for malloc, free */
-#include <stdarg.h> /* needed for va_*         */
 
 /*
  * vscprintf:
@@ -41,14 +42,11 @@ int vscprintf(const char *format, va_list ap) {
  * don't have to do anything
  */
 #ifdef _MSC_VER
-int vasprintf(char **strp, const char *format, va_list ap)
-{
+int vasprintf(char **strp, const char *format, va_list ap) {
     int len = vscprintf(format, ap);
-    if (len == -1)
-        return -1;
-    char *str = (char*)malloc((size_t) len + 1);
-    if (!str)
-        return -1;
+    if (len == -1) return -1;
+    char *str = (char *)malloc((size_t)len + 1);
+    if (!str) return -1;
     int retval = vsnprintf(str, len + 1, format, ap);
     if (retval == -1) {
         free(str);
@@ -58,8 +56,7 @@ int vasprintf(char **strp, const char *format, va_list ap)
     return retval;
 }
 
-int asprintf(char **strp, const char *format, ...)
-{
+int asprintf(char **strp, const char *format, ...) {
     va_list ap;
     va_start(ap, format);
     int retval = vasprintf(strp, format, ap);

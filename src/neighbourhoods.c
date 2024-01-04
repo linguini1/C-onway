@@ -1,10 +1,10 @@
 /**
-* Contains logic for accessing different cell neighbourhoods.
+ * Contains logic for accessing different cell neighbourhoods.
  * @author Matteo Golin
  * @version 1.0
-*/
+ */
 
-#include "neighbourhoods.h"
+#include "../include/neighbourhoods.h"
 #include <stdlib.h>
 
 /* NEIGHBOURHOODS */
@@ -23,11 +23,10 @@ const Neighbourhood TRIPLE_MOORE_CORNER = {24, {TripleMooreCorner}};
  * @param coord The coordinate to be translated
  * @param x The x amount to translate the coordinate by
  * @param y The y amount to translate the coordinate by
- * @return A new coordinate which is the translated version of the passed coordinate.
+ * @return A new coordinate which is the translated version of the passed
+ * coordinate.
  */
-Coordinate translate(Coordinate coord, int x, int y) {
-    return (Coordinate) {coord.x + x, coord.y + y};
-}
+Coordinate translate(Coordinate coord, int x, int y) { return (Coordinate){coord.x + x, coord.y + y}; }
 
 /**
  * Translates all coordinates in an array.
@@ -43,22 +42,23 @@ void translate_coordinates(Coordinate *coords, unsigned int len, int x, int y) {
 }
 
 /**
- * If the coordinate is out of the environment boundaries, wrap it around to the opposite side.
+ * If the coordinate is out of the environment boundaries, wrap it around to the
+ * opposite side.
  * @param coord
  * @return The wrapped coordinate
  */
 Coordinate wrap(Environment const *env, Coordinate coord) {
     if (coord.x < 0) {
-        coord.x += (int) env->width;
+        coord.x += (int)env->width;
     }
     if (coord.x >= env->width) {
-        coord.x -= (int) env->width;
+        coord.x -= (int)env->width;
     }
     if (coord.y < 0) {
-        coord.y += (int) env->height;
+        coord.y += (int)env->height;
     }
     if (coord.y >= env->height) {
-        coord.y -= (int) env->height;
+        coord.y -= (int)env->height;
     }
     return coord;
 }
@@ -66,13 +66,15 @@ Coordinate wrap(Environment const *env, Coordinate coord) {
 /* NEIGHBOUR LOGIC */
 
 /**
- * Returns an array of 8 booleans representing the state of each of a cells 8 neighbours (in order of the NEIGHBOURS
- * constant)
+ * Returns an array of 8 booleans representing the state of each of a cells 8
+ * neighbours (in order of the NEIGHBOURS constant)
  * @param env The environment where the cell lives
  * @param x The x coordinate of the cell being examined
  * @param y The y coordinate of the cell being examined
- * @param consider The number of neighbours to consider from the NEIGHBOURS constant, in the order they appear
- * @return An array of 8 booleans corresponding to the cell's 8 neighbours' states
+ * @param consider The number of neighbours to consider from the NEIGHBOURS
+ * constant, in the order they appear
+ * @return An array of 8 booleans corresponding to the cell's 8 neighbours'
+ * states
  */
 bool *neighbours(Environment const *env, unsigned int x, unsigned int y, Neighbourhood const *neighbourhood) {
 
@@ -80,10 +82,11 @@ bool *neighbours(Environment const *env, unsigned int x, unsigned int y, Neighbo
     bool *neighbour_states = malloc(sizeof(bool) * neighbourhood->size);
 
     for (unsigned int i = 0; i < neighbourhood->size; i++) {
-        // Calculate position of current neighbour in each of the 8 surrounding cells
+        // Calculate position of current neighbour in each of the 8 surrounding
+        // cells
         Coordinate position = neighbourhood->neighbours[i];
-        Coordinate neighbour = {(int) x + position.x, (int) y + position.y};
-        neighbour = wrap(env, neighbour);  // If neighbour out of bounds, wrap around
+        Coordinate neighbour = {(int)x + position.x, (int)y + position.y};
+        neighbour = wrap(env, neighbour); // If neighbour out of bounds, wrap around
 
         // Store states
         neighbour_states[i] = access(env, neighbour.x, neighbour.y);
@@ -92,22 +95,25 @@ bool *neighbours(Environment const *env, unsigned int x, unsigned int y, Neighbo
 }
 
 /**
- * Calculates the number of living neighbours surrounding the cell. Cells on the environment
- * border will look past the borders as though wrapping to the other side..
+ * Calculates the number of living neighbours surrounding the cell. Cells on the
+ * environment border will look past the borders as though wrapping to the other
+ * side..
  * @param env The environment where the cell lives
  * @param x The x coordinate of the current cell
  * @param y The y coordinate of the current cell
- * @param consider The number of neighbours to consider from the NEIGHBOURS constant, in the order they appear
+ * @param consider The number of neighbours to consider from the NEIGHBOURS
+ * constant, in the order they appear
  * @return The number of living neighbours around the current cell
  */
-unsigned int
-num_neighbours(Environment const *env, unsigned int x, unsigned int y, Neighbourhood const *neighbourhood) {
+unsigned int num_neighbours(Environment const *env, unsigned int x, unsigned int y,
+                            Neighbourhood const *neighbourhood) {
 
     int neighbour_count = 0;
     bool *neighbour_states = neighbours(env, x, y, neighbourhood); // Get neighbour states
 
     for (int i = 0; i < neighbourhood->size; i++) {
-        neighbour_count += neighbour_states[i]; // 1 if true, 0 if false, so total will be number of alive states
+        neighbour_count += neighbour_states[i]; // 1 if true, 0 if false, so total
+                                                // will be number of alive states
     }
     free(neighbour_states); // No longer used
     return neighbour_count;

@@ -1,4 +1,9 @@
-/.idea
+# Object files
+*.o
 
-# External libraries
-/cmake-build-debug
+# Binaries
+conway
+
+# Debug & development
+compile_commands.json
+vgcore*

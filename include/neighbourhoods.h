@@ -1,14 +1,14 @@
 /**
-* Contains logic for accessing different cell neighbourhoods, as well as some included cell neighbourhoods from
+ * Contains logic for accessing different cell neighbourhoods, as well as some included cell neighbourhoods from
  * established cellular automata.
  * @author Matteo Golin
  * @version 1.0
-*/
+ */
 #ifndef CONWAY_NEIGHBOURHOODS_H
 #define CONWAY_NEIGHBOURHOODS_H
 
-#include <stdbool.h>
 #include "environment.h"
+#include <stdbool.h>
 
 /* CUSTOM TYPES */
 typedef struct coord {
@@ -22,13 +22,19 @@ typedef struct neighbourhood {
 } Neighbourhood;
 
 /* NEIGHBOURHOODS */
-#define VonNeumann {0,-1}, {0,1}, {1,0}, {-1,0}
-#define VonNeumannCorners {1,-1}, {1,1}, {-1,-1}, {-1,1}
-#define Lesse VonNeumannCorners, {0,-2}, {0,2}, {2,0}, {-2,0}
+#define VonNeumann                                                                                                     \
+    {0, -1}, {0, 1}, {1, 0}, { -1, 0 }
+#define VonNeumannCorners                                                                                              \
+    {1, -1}, {1, 1}, {-1, -1}, { -1, 1 }
+#define Lesse                                                                                                          \
+    VonNeumannCorners, {0, -2}, {0, 2}, {2, 0}, { -2, 0 }
 #define Moore VonNeumann, VonNeumannCorners
-#define VonNeumannR2 Moore, {0,-2}, {0,2}, {2,0}, {-2,0}
-#define TripleMoore VonNeumannR2, {-1,-2}, {1,-2}, {-1,2}, {1, 2}, {-2,-1}, {-2,1}, {2,-1}, {2,1}
-#define TripleMooreCorner TripleMoore, {-2,-2}, {-2,2}, {2,-2}, {2,2}
+#define VonNeumannR2                                                                                                   \
+    Moore, {0, -2}, {0, 2}, {2, 0}, { -2, 0 }
+#define TripleMoore                                                                                                    \
+    VonNeumannR2, {-1, -2}, {1, -2}, {-1, 2}, {1, 2}, {-2, -1}, {-2, 1}, {2, -1}, { 2, 1 }
+#define TripleMooreCorner                                                                                              \
+    TripleMoore, {-2, -2}, {-2, 2}, {2, -2}, { 2, 2 }
 
 /* EXTERNAL NEIGHBOURHOOD CONSTANTS */
 extern const Neighbourhood VON_NEUMANN;

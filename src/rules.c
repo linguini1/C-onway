@@ -1,27 +1,19 @@
 /**
-* Contains rules for determining cell state, various cell types and logic for updating the simulation
+ * Contains rules for determining cell state, various cell types and logic for updating the simulation
  * environment using those rules.
  * @author Matteo Golin
  * @version 1.0
-*/
+ */
 
-#include "asprintf.h"
-#include "rules.h"
+#include "../include/rules.h"
+#include "../include/asprintf.h"
 #include <stdlib.h>
 
 /* NUMBER KEY TO CELL TYPE MAPPING FOR SIMULATION SELECTION */
 // Each number key 0-9 maps directly to an index of this array.
 const CellType CELL_MAP[10] = {
-        ConwayCell,
-        ConwayCell,
-        LesseConwayCell,
-        VonNeumannR2ConwayCell,
-        TripleMooreConwayCell,
-        MazeCell,
-        FractalCornerCell,
-        FractalCell,
-        NoiseCell,
-        ConwayCancerCell,
+    ConwayCell,        ConwayCell,  LesseConwayCell, VonNeumannR2ConwayCell, TripleMooreConwayCell, MazeCell,
+    FractalCornerCell, FractalCell, NoiseCell,       ConwayCancerCell,
 };
 
 /* STATE CALCULATORS */
@@ -44,11 +36,11 @@ bool conway_next_state(Environment const *env, unsigned int x, unsigned int y) {
             // If 4 or more neighbours, it dies
             return false;
         } else {
-            return true;  // If it has 2-3 neighbours, it stays alive
+            return true; // If it has 2-3 neighbours, it stays alive
         }
     }
 
-        // If a cell is dead
+    // If a cell is dead
     else {
         // And it has exactly 3 neighbours, it becomes alive
         return neighbours == 3;
@@ -73,7 +65,7 @@ bool maze_next_state(Environment const *env, unsigned int x, unsigned int y) {
         }
         return false;
     }
-        // If dead
+    // If dead
     else {
         return neighbours == 3; // Exactly 3 neighbours to live
     }
@@ -97,7 +89,7 @@ bool noise_next_state(Environment const *env, unsigned int x, unsigned int y) {
         }
         return false;
     }
-        // If dead
+    // If dead
     else {
         return neighbours == 2; // Exactly 2 neighbours to live
     }
@@ -122,7 +114,7 @@ bool fractal_next_state(Environment const *env, unsigned int x, unsigned int y) 
         }
         return false;
     }
-        // If dead
+    // If dead
     else {
         return neighbours == 1; // Must have exactly 1 neighbour to be born
     }
@@ -147,7 +139,7 @@ bool fractal_corner_next_state(Environment const *env, unsigned int x, unsigned 
         }
         return false;
     }
-        // If dead
+    // If dead
     else {
         return neighbours == 1; // Must have exactly 1 neighbour to be born
     }
@@ -172,11 +164,11 @@ bool lesse_conway_next_state(Environment const *env, unsigned int x, unsigned in
             // If 4 or more neighbours, it dies
             return false;
         } else {
-            return true;  // If it has 2-3 neighbours, it stays alive
+            return true; // If it has 2-3 neighbours, it stays alive
         }
     }
 
-        // If a cell is dead
+    // If a cell is dead
     else {
         // And it has exactly 3 neighbours, it becomes alive
         return neighbours == 3;
@@ -215,11 +207,11 @@ bool triple_moore_conway_next_state(Environment const *env, unsigned int x, unsi
             // If 4 or more neighbours, it dies
             return false;
         } else {
-            return true;  // If it has 2-3 neighbours, it stays alive
+            return true; // If it has 2-3 neighbours, it stays alive
         }
     }
 
-        // If a cell is dead
+    // If a cell is dead
     else {
         // And it has exactly 3 neighbours, it becomes alive
         return (neighbour_count <= 10 && neighbour_count >= 7) && (closest_eight > 2 && closest_eight < 5);
@@ -256,11 +248,11 @@ bool von_neumann_r2_conway_next_state(Environment const *env, unsigned int x, un
             // If four closest neighbours, it dies
             return false;
         } else {
-            return (closest_four > 0);  // If it has 3-4 neighbours, it stays alive
+            return (closest_four > 0); // If it has 3-4 neighbours, it stays alive
         }
     }
 
-        // If a cell is dead
+    // If a cell is dead
     else {
         // And it has exactly 4 neighbours, it becomes alive
         return (neighbour_count == 4) && (closest_four > 0);
@@ -288,11 +280,11 @@ bool conway_cancer_next_state(Environment const *env, unsigned int x, unsigned i
             // If 5 or more neighbours, it dies
             return false;
         } else {
-            return true;  // If it has 3-4 neighbours, it stays alive
+            return true; // If it has 3-4 neighbours, it stays alive
         }
     }
 
-        // If a cell is dead
+    // If a cell is dead
     else {
         // And it has exactly 4 neighbours, it becomes alive
         return neighbours == 4;
@@ -309,21 +301,15 @@ bool conway_cancer_next_state(Environment const *env, unsigned int x, unsigned i
 void populate_analytics_string(char **string, Environment const *env, CellType *cell_type) {
 
     SimulationAnalytics data = env->data;
-    float percent_alive = ((float) (data.total_cells) / (float) (env->width * env->height)) * 100.0f;
-    float initial_cells = data.initial_cells == 0 ? 1.0f : (float) data.initial_cells;
-    float growth = ((float) data.total_cells / initial_cells) * 100.0f;
+    float percent_alive = ((float)(data.total_cells) / (float)(env->width * env->height)) * 100.0f;
+    float initial_cells = data.initial_cells == 0 ? 1.0f : (float)data.initial_cells;
+    float growth = ((float)data.total_cells / initial_cells) * 100.0f;
 
-    asprintf(
-            string,
-            "cell type: %s\ngenerations: %llu\ninitial cells: %u\ncells: %lu\npercentage alive: %.3f%%\ngrowth: %.1f%%\ngeneration length: %ums",
-            cell_type->name,
-            data.generations,
-            data.initial_cells,
-            data.total_cells,
-            percent_alive,
-            growth,
-            data.generation_speed
-    );
+    asprintf(string,
+             "cell type: %s\ngenerations: %llu\ninitial cells: %u\ncells: %lu\npercentage alive: %.3f%%\ngrowth: "
+             "%.1f%%\ngeneration length: %ums",
+             cell_type->name, data.generations, data.initial_cells, data.total_cells, percent_alive, growth,
+             data.generation_speed);
 }
 
 /* SIMULATION ENVIRONMENT */
@@ -334,7 +320,7 @@ void populate_analytics_string(char **string, Environment const *env, CellType *
 void next_generation(Environment *env, CellType *cell_type) {
 
     env->data.total_cells = 0; // Reset cell total
-    env->data.generations++; // Increase generations
+    env->data.generations++;   // Increase generations
 
     // Update the next generation with all the new states
     for (int x = 0; x < env->width; x++) {
@@ -367,7 +353,7 @@ void change_cell_type(CellType *cell_type, SDL_KeyCode key) {
     // Subtract 48 from SDL_Key to get the original digit.
     // Use this index to map to the corresponding cell in the CELL_MAP constant.
 
-    unsigned short int index = (unsigned short int) key - 48;
+    unsigned short int index = (unsigned short int)key - 48;
 
     // Prevent exceeding array length
     if (index < 0 || index > 9) {

@@ -1,11 +1,12 @@
 /**
-* Some basic functions for controlling simulation appearance.
+ * Some basic functions for controlling simulation appearance.
  * @author Matteo Golin
  * @version 1.0
-*/
-#include <SDL.h>
+ */
+#include "../include/palettes.h"
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_render.h>
 #include <stdbool.h>
-#include "palettes.h"
 
 /**
  * Set the draw colour of the renderer using a palette.

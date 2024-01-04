@@ -1,5 +1,6 @@
 /**
- * Contains logic for creating and manipulating the simulation environment along with simulation analytics.
+ * Contains logic for creating and manipulating the simulation environment along
+ * with simulation analytics.
  * @author Matteo Golin
  * @version 1.0
  */
