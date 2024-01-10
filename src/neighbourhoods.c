@@ -79,8 +79,7 @@ bool *neighbours(Environment const *env, unsigned int x, unsigned int y, Neighbo
                  bool *neighbour_states) {
 
     for (unsigned int i = 0; i < neighbourhood->size; i++) {
-        // Calculate position of current neighbour in each of the 8 surrounding
-        // cells
+        // Calculate position of current neighbour in each of the 8 surrounding cells
         Coordinate position = neighbourhood->neighbours[i];
         Coordinate neighbour = {(int)x + position.x, (int)y + position.y};
         neighbour = wrap(env, neighbour); // If neighbour out of bounds, wrap around

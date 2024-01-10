@@ -9,8 +9,6 @@
 #include <assert.h>
 #include <stdlib.h>
 
-/* ENVIRONMENT MANAGEMENT */
-
 /**
  * Create the Environment (grid) for cell growth to occur in, starting with all
  * dead cells.
@@ -34,11 +32,7 @@ Environment *env_init(unsigned int width, unsigned int height, unsigned int gene
 
     env->height = height;
     env->width = width;
-
-    // Create simulation grid
-    for (unsigned int i = 0; i < size; i++) {
-        env->grid[i] = false; // All values initialized to false
-    }
+    env_clear(env);
 
     // Simulation data
     env->data.total_cells = 0;

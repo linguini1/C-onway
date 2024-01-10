@@ -10,7 +10,6 @@
 #include "environment.h"
 #include <stdbool.h>
 
-/* CUSTOM TYPES */
 typedef struct coord {
     int x;
     int y;
@@ -45,12 +44,9 @@ extern const Neighbourhood VON_NEUMANN_R2;
 extern const Neighbourhood TRIPLE_MOORE;
 extern const Neighbourhood TRIPLE_MOORE_CORNER;
 
-/* COORDINATE MANIPULATION */
 Coordinate translate(Coordinate coord, int x, int y);
 void translate_coordinates(Coordinate *coords, unsigned int len, int x, int y);
 Coordinate wrap(Environment const *env, Coordinate coord);
-
-/* NEIGHBOUR LOGIC */
 bool *neighbours(Environment const *env, unsigned int x, unsigned int y, Neighbourhood const *neighbourhood,
                  bool *neighbour_states);
 unsigned int num_neighbours(Environment const *env, unsigned int x, unsigned int y, Neighbourhood const *neighbourhood);

@@ -12,7 +12,6 @@
 #include "neighbourhoods.h"
 #include <SDL2/SDL.h>
 
-/* CUSTOM TYPES */
 typedef bool (*StateCalculator)(Environment const *, unsigned int, unsigned int);
 
 typedef struct cell_type {
@@ -20,24 +19,16 @@ typedef struct cell_type {
     StateCalculator calculator;
 } CellType;
 
-/* STATE CALCULATORS */
-bool conway_next_state(Environment const *env, unsigned int x, unsigned int y);
-
-bool maze_next_state(Environment const *env, unsigned int x, unsigned int y);
-
-bool noise_next_state(Environment const *env, unsigned int x, unsigned int y);
-
-bool fractal_next_state(Environment const *env, unsigned int x, unsigned int y);
-
-bool fractal_corner_next_state(Environment const *env, unsigned int x, unsigned int y);
-
-bool lesse_conway_next_state(Environment const *env, unsigned int x, unsigned int y);
-
-bool triple_moore_conway_next_state(Environment const *env, unsigned int x, unsigned int y);
-
-bool conway_cancer_next_state(Environment const *env, unsigned int x, unsigned int y);
-
-bool von_neumann_r2_conway_next_state(Environment const *env, unsigned int x, unsigned int y);
+#define state_calculator(name) bool name(Environment const *env, unsigned int x, unsigned int y)
+state_calculator(conway_next_state);
+state_calculator(maze_next_state);
+state_calculator(noise_next_state);
+state_calculator(fractal_next_state);
+state_calculator(fractal_corner_next_state);
+state_calculator(lesse_conway_next_state);
+state_calculator(triple_moore_conway_next_state);
+state_calculator(conway_cancer_next_state);
+state_calculator(von_neumann_r2_conway_next_state);
 
 /* CELL TYPES */
 #define ConwayCell                                                                                                     \
@@ -62,13 +53,8 @@ bool von_neumann_r2_conway_next_state(Environment const *env, unsigned int x, un
 /* NUMBER KEY TO CELL TYPE MAPPING FOR SIMULATION SELECTION */
 extern const CellType CELL_MAP[];
 
-/* SIMULATION ANALYTICS */
 void populate_analytics_string(char **string, Environment const *env, CellType *cell_type);
-
-/* SIMULATION ENVIRONMENT */
 void next_generation(Environment *env, CellType *cell_type);
-
-/* MENU CONTROLS */
 void change_cell_type(CellType *cell_type, SDL_KeyCode key);
 
 #endif // CONWAY_RULES_H
