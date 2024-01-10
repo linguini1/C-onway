@@ -58,7 +58,4 @@ typedef struct palette {
 
 #define NUM_PALETTES 10
 
-// Helper functions
-void set_draw_colour(SDL_Renderer *renderer, Palette const *palette, bool light);
-
 #endif // CONWAY_PALETTES_H

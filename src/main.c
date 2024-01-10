@@ -19,6 +19,20 @@ typedef enum {
     DRAW_STATE_UNSET,
 } DrawState;
 
+typedef struct {
+    int x_offset;
+    int y_offset;
+    unsigned int zoom;
+    bool running;
+    bool playing;
+    bool dark_mode;
+    bool analytics_on;
+    DrawState draw_state;
+    CellType cell_type;
+    char *analytics_string;
+    short unsigned int palette;
+} GameState;
+
 // Font path
 #ifndef FONT_PATH
 #error "FONT_PATH not defined with the path to a ttf font. See README."
@@ -38,6 +52,23 @@ const Palette GAME_PALETTES[] = {Casio,   MonitorGlow, Nokia3310, EndGame,   Pap
 #define MAX_FRAME_DELAY 1000
 #define FRAME_DELAY_STEP 10
 #define FONT_SIZE 12
+
+static GameState game_state = {
+    .x_offset = 0,
+    .y_offset = 0,
+    .zoom = 0,                      // No zoom by default
+    .running = true,                // For quitting the animation
+    .playing = false,               // For play and pause
+    .dark_mode = true,              // Simulation runs in dark mode
+    .analytics_on = true,           // Shows analytics by default
+    .draw_state = DRAW_STATE_UNSET, // For drawing a cohesive line on drag
+    .cell_type = ConwayCell,        // Initialize starting game cell to classic Conway cell
+    .analytics_string = NULL,       // String for analytics text
+    .palette = 0,                   // Controls game palette
+};
+
+// Helper functions
+void set_draw_colour(SDL_Renderer *renderer, Palette const *palette, bool light);
 
 int main(int argc, char *argv[]) {
 
@@ -68,12 +99,9 @@ int main(int argc, char *argv[]) {
     SDL_SetWindowResizable(window, true); // Window should be resizable
 
     // Determine simulation size from window size
-    unsigned int game_width = initial_display_mode.w / (unsigned int)DEFAULT_SCALE;
-    unsigned int game_height = initial_display_mode.h / (unsigned int)DEFAULT_SCALE;
+    unsigned int game_width = initial_display_mode.w / DEFAULT_SCALE;
+    unsigned int game_height = initial_display_mode.h / DEFAULT_SCALE;
     SDL_Point *points = malloc(sizeof(SDL_Point) * game_width * game_height);
-    unsigned int zoom = 0; // No zoom by default
-    int x_offset = 0;
-    int y_offset = 0;
 
     // Create renderer
     SDL_Renderer *renderer = SDL_CreateRenderer(
@@ -90,26 +118,18 @@ int main(int argc, char *argv[]) {
 
     // Runtime variables
     unsigned int generation_timer = SDL_GetTicks(); // Slow generations without slowing animation
-    bool running = true;                            // For quitting the animation
-    bool playing = false;                           // For play and pause
-    bool dark_mode = true;                          // Simulation runs in dark mode
-    bool analytics_on = true;                       // Shows analytics by default
-    DrawState draw_state = DRAW_STATE_UNSET;        // For drawing a cohesive line on drag
     SDL_Event event;                                // For capturing events
 
     // Simulation assets
     Environment *environment = env_init(game_width, game_height, DEFAULT_FRAME_DELAY);
-    CellType cell_type = ConwayCell;
-    char *analytics_string;         // String for analytics text
-    short unsigned int palette = 0; // Controls game palette
 
-    while (running) {
+    while (game_state.running) {
 
         // Handle events
         while (SDL_PollEvent(&event)) {
 
             // Quit program (esc)
-            if (event.type == SDL_QUIT) running = false;
+            if (event.type == SDL_QUIT) game_state.running = false;
 
             // Keypress events
             if (event.type == SDL_KEYDOWN) {
@@ -118,10 +138,10 @@ int main(int argc, char *argv[]) {
                 switch (key) {
                 case SDLK_ESCAPE:
                 case SDLK_q:
-                    running = false;
+                    game_state.running = false;
                     break;
                 case SDLK_SPACE:
-                    playing = !playing;
+                    game_state.playing = !game_state.playing;
                     break;
                 case SDLK_MINUS:
                 case SDLK_KP_MINUS:
@@ -138,19 +158,19 @@ int main(int argc, char *argv[]) {
                     environment->data.generation_speed = 0; // Max speed
                     break;
                 case SDLK_d:
-                    dark_mode = !dark_mode;
+                    game_state.dark_mode = !game_state.dark_mode;
                     break;
                 case SDLK_a:
-                    analytics_on = !analytics_on;
+                    game_state.analytics_on = !game_state.analytics_on;
                     break;
                 case SDLK_c:
                     env_clear(environment);
                     break;
                 case SDLK_t:
-                    palette = (palette + 1) % NUM_PALETTES;
+                    game_state.palette = (game_state.palette + 1) % NUM_PALETTES;
                     break;
                 default:
-                    if (0x30 <= key && key <= 0x39) change_cell_type(&cell_type, key);
+                    if (0x30 <= key && key <= 0x39) change_cell_type(&game_state.cell_type, key);
                     break;
                 }
             }
@@ -158,43 +178,42 @@ int main(int argc, char *argv[]) {
             // Mouse click or click and drag
             if ((event.type == SDL_MOUSEBUTTONDOWN && event.button.state == SDL_PRESSED) ||
                 (event.type == SDL_MOUSEMOTION && event.motion.state)) {
-                unsigned int x = event.button.x / (DEFAULT_SCALE + zoom) - x_offset;
-                unsigned int y = event.button.y / (DEFAULT_SCALE + zoom) - y_offset;
+                unsigned int x = event.button.x / (DEFAULT_SCALE + game_state.zoom) - game_state.x_offset;
+                unsigned int y = event.button.y / (DEFAULT_SCALE + game_state.zoom) - game_state.y_offset;
                 if (env_in_bounds(environment, x, y)) {
-                    if (draw_state == DRAW_STATE_UNSET) {
-                        draw_state = env_toggle_cell(environment, x, y) ? DRAW_STATE_CELL : DRAW_STATE_NONE;
+                    if (game_state.draw_state == DRAW_STATE_UNSET) {
+                        game_state.draw_state = env_toggle_cell(environment, x, y) ? DRAW_STATE_CELL : DRAW_STATE_NONE;
                     } else {
-                        env_write(environment, x, y, draw_state);
+                        env_write(environment, x, y, game_state.draw_state);
                     }
                 }
             } else if (event.button.state == SDL_RELEASED) {
-                draw_state = DRAW_STATE_UNSET;
+                game_state.draw_state = DRAW_STATE_UNSET;
             }
 
             // Scroll to zoom
             if (event.type == SDL_MOUSEWHEEL) {
-                if (event.wheel.y > 0 && DEFAULT_SCALE + zoom + ZOOM_STEP <= MAX_SCALE) {
-                    zoom += ZOOM_STEP;
-                } else if (event.wheel.y < 0 && DEFAULT_SCALE + zoom - ZOOM_STEP >= DEFAULT_SCALE) {
-                    zoom -= ZOOM_STEP;
+                if (event.wheel.y > 0 && DEFAULT_SCALE + game_state.zoom + ZOOM_STEP <= MAX_SCALE) {
+                    game_state.zoom += ZOOM_STEP;
+                } else if (event.wheel.y < 0 && DEFAULT_SCALE + game_state.zoom - ZOOM_STEP >= DEFAULT_SCALE) {
+                    game_state.zoom -= ZOOM_STEP;
                 }
             }
         }
 
         // Clear screen
-        SDL_RenderSetScale(renderer, (float)(DEFAULT_SCALE + zoom),
-                           (float)(DEFAULT_SCALE + zoom));              // Scale for cells
-        set_draw_colour(renderer, &GAME_PALETTES[palette], !dark_mode); // Dead cell colour
+        SDL_RenderSetScale(renderer, (DEFAULT_SCALE + game_state.zoom), (DEFAULT_SCALE + game_state.zoom));
+        set_draw_colour(renderer, &GAME_PALETTES[game_state.palette], !game_state.dark_mode); // Dead cell colour
         SDL_RenderClear(renderer);
-        set_draw_colour(renderer, &GAME_PALETTES[palette], dark_mode); // Living cell colour
+        set_draw_colour(renderer, &GAME_PALETTES[game_state.palette], game_state.dark_mode); // Living cell colour
 
         // Draw cells
         unsigned int count = 0;
         for (unsigned int x = 0; x < game_width; x++) {
             for (unsigned int y = 0; y < game_height; y++) {
                 if (env_access(environment, x, y) == true) {
-                    points[count].x = x + x_offset;
-                    points[count].y = y + y_offset;
+                    points[count].x = x + game_state.x_offset;
+                    points[count].y = y + game_state.y_offset;
                     count++;
                 }
             }
@@ -202,12 +221,14 @@ int main(int argc, char *argv[]) {
         SDL_RenderDrawPoints(renderer, points, count);
 
         // Create analytics
-        populate_analytics_string(&analytics_string, environment, &cell_type); // Create analytics string
+        populate_analytics_string(&game_state.analytics_string, environment,
+                                  &game_state.cell_type); // Create analytics string
         SDL_DisplayMode display_mode;
         SDL_GetCurrentDisplayMode(0, &display_mode); // Get current width and height for text wrapping
         SDL_Surface *analytics_surface = TTF_RenderText_Solid_Wrapped(
-            font, analytics_string,
-            dark_mode ? GAME_PALETTES[palette].light : GAME_PALETTES[palette].dark, // Switch colour with toggle
+            font, game_state.analytics_string,
+            game_state.dark_mode ? GAME_PALETTES[game_state.palette].light
+                                 : GAME_PALETTES[game_state.palette].dark, // Switch colour with toggle
             display_mode.w // Wrap on \n or when width is larger than window width
         );
         // Display text in top left corner
@@ -216,15 +237,15 @@ int main(int argc, char *argv[]) {
         SDL_FreeSurface(analytics_surface); // No longer needed after being added to texture
 
         // If analytics are turned on, draw them
-        if (analytics_on) {
+        if (game_state.analytics_on) {
             SDL_RenderSetScale(renderer, FONT_SCALE, FONT_SCALE); // Text scale back to 1
             SDL_RenderCopy(renderer, analytics_texture, NULL, &analytics_rect);
         }
         SDL_DestroyTexture(analytics_texture);
 
         // Calculate the next generation if playing and enough time has passed since last generation
-        if (playing && (SDL_GetTicks() - generation_timer) >= environment->data.generation_speed) {
-            next_generation(environment, &cell_type);
+        if (game_state.playing && (SDL_GetTicks() - generation_timer) >= environment->data.generation_speed) {
+            next_generation(environment, &game_state.cell_type);
             generation_timer = SDL_GetTicks();
         }
 
@@ -232,7 +253,7 @@ int main(int argc, char *argv[]) {
         SDL_RenderPresent(renderer);
 
         // Clean up
-        free(analytics_string);
+        free(game_state.analytics_string);
     }
 
     // Release simulation assets
@@ -247,4 +268,20 @@ int main(int argc, char *argv[]) {
     SDL_Quit();
 
     return EXIT_SUCCESS;
+}
+
+/**
+ * Set the draw colour of the renderer using a palette.
+ * @param renderer The SDL renderer being used.
+ * @param palette The selected palette.
+ * @param light Whether to use the light colour or the dark colour of the palette (true for light, false for dark).
+ */
+void set_draw_colour(SDL_Renderer *renderer, Palette const *palette, bool light) {
+
+    SDL_Color colour;
+    if (light)
+        colour = palette->light;
+    else
+        colour = palette->dark;
+    SDL_SetRenderDrawColor(renderer, colour.r, colour.g, colour.b, 255);
 }
