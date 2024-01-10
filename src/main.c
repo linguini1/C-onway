@@ -5,12 +5,19 @@
  */
 #include "../include/palettes.h"
 #include "../include/rules.h"
+#include "SDL_events.h"
 #include "SDL_keycode.h"
 #include "SDL_render.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <stdbool.h>
 #include <stdio.h>
+
+typedef enum {
+    DRAW_STATE_NONE = 0,
+    DRAW_STATE_CELL = 1,
+    DRAW_STATE_UNSET,
+} DrawState;
 
 // Font path
 #ifndef FONT_PATH
@@ -87,7 +94,7 @@ int main(int argc, char *argv[]) {
     bool playing = false;                           // For play and pause
     bool dark_mode = true;                          // Simulation runs in dark mode
     bool analytics_on = true;                       // Shows analytics by default
-    bool selected_state = false;                    // For drawing a cohesive line on drag
+    DrawState draw_state = DRAW_STATE_UNSET;        // For drawing a cohesive line on drag
     SDL_Event event;                                // For capturing events
 
     // Simulation assets
@@ -149,10 +156,19 @@ int main(int argc, char *argv[]) {
             }
 
             // Mouse click or click and drag
-            if (event.type == SDL_MOUSEBUTTONDOWN || (event.type == SDL_MOUSEMOTION && event.motion.state)) {
-                unsigned int x = event.motion.x / (DEFAULT_SCALE + zoom) - x_offset;
-                unsigned int y = event.motion.y / (DEFAULT_SCALE + zoom) - y_offset;
-                if (env_in_bounds(environment, x, y)) env_toggle_cell(environment, x, y);
+            if ((event.type == SDL_MOUSEBUTTONDOWN && event.button.state == SDL_PRESSED) ||
+                (event.type == SDL_MOUSEMOTION && event.motion.state)) {
+                unsigned int x = event.button.x / (DEFAULT_SCALE + zoom) - x_offset;
+                unsigned int y = event.button.y / (DEFAULT_SCALE + zoom) - y_offset;
+                if (env_in_bounds(environment, x, y)) {
+                    if (draw_state == DRAW_STATE_UNSET) {
+                        draw_state = env_toggle_cell(environment, x, y) ? DRAW_STATE_CELL : DRAW_STATE_NONE;
+                    } else {
+                        env_write(environment, x, y, draw_state);
+                    }
+                }
+            } else if (event.button.state == SDL_RELEASED) {
+                draw_state = DRAW_STATE_UNSET;
             }
 
             // Scroll to zoom
