@@ -150,7 +150,7 @@ int main(int argc, char *argv[]) {
             if (event.type == SDL_MOUSEBUTTONDOWN || (event.type == SDL_MOUSEMOTION && event.motion.state)) {
                 unsigned int x = event.motion.x / (DEFAULT_SCALE + zoom) - x_offset;
                 unsigned int y = event.motion.y / (DEFAULT_SCALE + zoom) - y_offset;
-                env_toggle_cell(environment, x, y);
+                if (env_in_bounds(environment, x, y)) env_toggle_cell(environment, x, y);
             }
 
             // Scroll to zoom

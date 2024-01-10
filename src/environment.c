@@ -90,14 +90,14 @@ bool env_access(Environment const *env, unsigned int x, unsigned int y) {
 }
 
 /**
- * Writes a value to the (x, y) coordinate in the simulation grid
+ * Writes a value to the (x, y) coordinate in the simulation grid. WARNING: This function assumes that the coordinates
+ * are in bounds.
  * @param env The environment to be modified
  * @param x The x coordinate of the location to be modified
  * @param y The y coordinate of the location to be modified
  * @param value The value to be written to the (x, y) location
  */
 void env_write(Environment *env, unsigned int x, unsigned int y, bool value) {
-    assert(env_in_bounds(env, x, y));        // Assert x, y in bounds
     unsigned int i = ((env->width) * y) + x; // Calculate index
     env->grid[i] = value;
 }
@@ -117,8 +117,14 @@ bool env_in_bounds(Environment const *env, unsigned int x, unsigned int y) {
     return false;
 }
 
+/**
+ * Toggles the cell at the coordinates. WARNING: Assumes that the coordinates are already in bounds.
+ * @param env The environment in which to toggle the cell.
+ * @param x The x location of the cell to be toggled.
+ * @param y The y location of the cell to be toggled.
+ * @return The new cell state.
+ */
 bool env_toggle_cell(Environment *env, unsigned int x, unsigned int y) {
-    if (!env_in_bounds(env, x, y)) return false;
     unsigned int i = ((env->width) * y) + x; // Calculate index
 
     // Update stats
@@ -128,5 +134,5 @@ bool env_toggle_cell(Environment *env, unsigned int x, unsigned int y) {
         env->data.initial_cells--;
     }
     env->grid[i] = !env->grid[i];
-    return true;
+    return env->grid[i];
 }
