@@ -37,25 +37,35 @@ Run the executable and interact with the live simulation windows with the contro
 - SDL_ttf library (2.20.2)
 
 Building has currently only been tested on (Arch) Linux. Simply run `make all` to compile the entire program and link it
-with the SDL2 and SDL2_ttf libraries.
+with the SDL2 libraries.
+
+On Windows, the same applies, but you will need to provide the paths to your SDL2 `lib` and `include` folders. The build
+command may look something like this:
+
+```console
+make all \
+SDL_INC=C:/path/to/SDL2/x86_64/include \
+SDL_LINK=C:/path/to/SDL2/x86_64/lib
+SDLTTF_INC=C:/path/to/SDL2_ttf/x86_64/include \
+SDLTTF_LINK=C:/path/to/SDL2_ttf/x86_64/lib
+```
 
 ### Fonts
 
 The default TTF font used for this program is included in the `src/` directory. However, you may also provide your own
 TTF font if you prefer.
 
-Compiling by hand, you must simply define `FONT_PATH` as a string containing the path to your TTF font:
+Compiling by hand, you must simply define `FONT_PATH` as the path to your desired TTF font:
 
 ```console
-gcc ...<cflags>... -o main.o -c main.c -DFONT_PATH='"/path/to/font"'
+gcc <cflags> -o main.o -c main.c -DFONT_PATH=/path/to/font.ttf
 ```
 
-Compiling without `FONT_PATH` defined will provide a compile error.
+Compiling without `FONT_PATH` defined will provide a compile error. It is already defined with the default font for you
+if you are compiling with Make.
 
 To change the path to something other than the default TTF font, you may call:
 
 ```console
 make all FONT_PATH=path/to/font
 ```
-
-The quotations required to make the path a C-string will be added for you.
