@@ -6,6 +6,7 @@
 #include "../include/palettes.h"
 #include "../include/rules.h"
 #include "SDL_keycode.h"
+#include "SDL_render.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <stdbool.h>
@@ -62,11 +63,12 @@ int main(int argc, char *argv[]) {
     // Determine simulation size from window size
     unsigned int game_width = initial_display_mode.w / (unsigned int)DEFAULT_SCALE;
     unsigned int game_height = initial_display_mode.h / (unsigned int)DEFAULT_SCALE;
+    SDL_Point *points = malloc(sizeof(SDL_Point) * game_width * game_height);
     unsigned int zoom = 0; // No zoom by default
     int x_offset = 0;
     int y_offset = 0;
 
-    // Create enderer
+    // Create renderer
     SDL_Renderer *renderer = SDL_CreateRenderer(
         window, -1,
         SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC // Accelerated and in sync with monitor refresh rate
@@ -145,35 +147,10 @@ int main(int argc, char *argv[]) {
             }
 
             // Mouse click or click and drag
-            if (event.type == SDL_MOUSEBUTTONDOWN) {
+            if (event.type == SDL_MOUSEBUTTONDOWN || (event.type == SDL_MOUSEMOTION && event.motion.state)) {
                 unsigned int x = event.motion.x / (DEFAULT_SCALE + zoom) - x_offset;
                 unsigned int y = event.motion.y / (DEFAULT_SCALE + zoom) - y_offset;
-
-                // Coordinates must be within boundaries, otherwise the action will be ignored
-                if (env_in_bounds(environment, x, y)) {
-                    selected_state = !env_access(environment, x, y);
-                    if (selected_state) {
-                        environment->data.initial_cells++; // These are not natural cells, so they should be registered
-                    } else if (environment->data.initial_cells - 1 > 0) {
-                        environment->data.initial_cells--; // A cell has been removed
-                    }
-                    env_write(environment, x, y, selected_state); // Toggle cell state at click
-                }
-            }
-
-            if (event.type == SDL_MOUSEMOTION && event.motion.state) {
-                unsigned int x = event.motion.x / (unsigned int)(DEFAULT_SCALE + zoom) - x_offset;
-                unsigned int y = event.motion.y / (unsigned int)(DEFAULT_SCALE + zoom) - y_offset;
-
-                // Coordinates must be within boundaries, otherwise the action will be ignored
-                if (env_in_bounds(environment, x, y)) {
-                    if (selected_state) {
-                        environment->data.initial_cells++; // These are not natural cells, so they should be registered
-                    } else if (environment->data.initial_cells - 1 > 0) {
-                        environment->data.initial_cells--; // A cell has been removed
-                    }
-                    env_write(environment, x, y, selected_state); // Toggle cell state at click
-                }
+                env_toggle_cell(environment, x, y);
             }
 
             // Scroll to zoom
@@ -194,13 +171,17 @@ int main(int argc, char *argv[]) {
         set_draw_colour(renderer, &GAME_PALETTES[palette], dark_mode); // Living cell colour
 
         // Draw cells
+        unsigned int count = 0;
         for (unsigned int x = 0; x < game_width; x++) {
             for (unsigned int y = 0; y < game_height; y++) {
                 if (env_access(environment, x, y) == true) {
-                    SDL_RenderDrawPoint(renderer, x + x_offset, y + y_offset); // Allows arrow key movement
+                    points[count].x = x + x_offset;
+                    points[count].y = y + y_offset;
+                    count++;
                 }
             }
         }
+        SDL_RenderDrawPoints(renderer, points, count);
 
         // Create analytics
         populate_analytics_string(&analytics_string, environment, &cell_type); // Create analytics string
@@ -238,6 +219,7 @@ int main(int argc, char *argv[]) {
 
     // Release simulation assets
     env_destroy(environment);
+    free(points);
     TTF_CloseFont(font);
 
     // Release resources

@@ -78,14 +78,13 @@ void env_clear(Environment *env) {
 /* ENVIRONMENT ACCESS & MANIPULATION */
 
 /**
- * Allows indexing of the flattened 2D array environment
+ * Allows indexing of the flattened 2D array environment. WARNING: assumes that coordinates are in bounds.
  * @param env The environment to be accessed
  * @param x The x coordinate of the desired cell
  * @param y The y coordinate of the desired cell
- * @return
+ * @return The state of the cell at the provided coordinates.
  */
 bool env_access(Environment const *env, unsigned int x, unsigned int y) {
-    assert(env_in_bounds(env, x, y));        // Assert x, y in bounds
     unsigned int i = ((env->width) * y) + x; // Calculate index
     return env->grid[i];
 }
@@ -116,4 +115,18 @@ bool env_in_bounds(Environment const *env, unsigned int x, unsigned int y) {
         return true;
     }
     return false;
+}
+
+bool env_toggle_cell(Environment *env, unsigned int x, unsigned int y) {
+    if (!env_in_bounds(env, x, y)) return false;
+    unsigned int i = ((env->width) * y) + x; // Calculate index
+
+    // Update stats
+    if (env->grid[i]) {
+        env->data.initial_cells++;
+    } else {
+        env->data.initial_cells--;
+    }
+    env->grid[i] = !env->grid[i];
+    return true;
 }
