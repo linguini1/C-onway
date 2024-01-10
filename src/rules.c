@@ -185,7 +185,8 @@ bool lesse_conway_next_state(Environment const *env, unsigned int x, unsigned in
 bool triple_moore_conway_next_state(Environment const *env, unsigned int x, unsigned int y) {
 
     bool alive = env_access(env, x, y);
-    bool *neighbour_vector = neighbours(env, x, y, &TRIPLE_MOORE); // Determine neighbours
+    bool neighbour_vector[TRIPLE_MOORE.size];
+    neighbours(env, x, y, &TRIPLE_MOORE, &neighbour_vector[0]); // Determine neighbours
 
     // The first eight neighbours
     int neighbour_count = 0;
@@ -198,7 +199,6 @@ bool triple_moore_conway_next_state(Environment const *env, unsigned int x, unsi
     for (unsigned int i = 8; i < TRIPLE_MOORE.size; i++) {
         neighbour_count += neighbour_vector[i];
     }
-    free(neighbour_vector); // Done with vector
 
     // If a cell is alive:
     if (alive) {
@@ -228,7 +228,8 @@ bool triple_moore_conway_next_state(Environment const *env, unsigned int x, unsi
 bool von_neumann_r2_conway_next_state(Environment const *env, unsigned int x, unsigned int y) {
 
     bool alive = env_access(env, x, y);
-    bool *neighbour_vector = neighbours(env, x, y, &VON_NEUMANN_R2); // Determine neighbours
+    bool neighbour_vector[VON_NEUMANN_R2.size];
+    neighbours(env, x, y, &VON_NEUMANN_R2, &neighbour_vector[0]); // Determine neighbours
 
     // The first four neighbours
     int closest_four = neighbour_vector[0] + neighbour_vector[1] + neighbour_vector[2] + neighbour_vector[3];
@@ -238,7 +239,6 @@ bool von_neumann_r2_conway_next_state(Environment const *env, unsigned int x, un
     for (unsigned int i = 4; i < VON_NEUMANN_R2.size; i++) {
         neighbour_count += neighbour_vector[i];
     }
-    free(neighbour_vector); // Done with vector
 
     // If a cell is alive:
     if (alive) {

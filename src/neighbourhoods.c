@@ -71,15 +71,12 @@ Coordinate wrap(Environment const *env, Coordinate coord) {
  * @param env The environment where the cell lives
  * @param x The x coordinate of the cell being examined
  * @param y The y coordinate of the cell being examined
- * @param consider The number of neighbours to consider from the NEIGHBOURS
- * constant, in the order they appear
- * @return An array of 8 booleans corresponding to the cell's 8 neighbours'
- * states
+ * @param neighbourhood The neighbourhood to consider
+ * @param neighbour_states An empty buffer of `neighbourhood->size` booleans in which the states will be stored
+ * @return An array of 8 booleans corresponding to the cell's 8 neighbours' states
  */
-bool *neighbours(Environment const *env, unsigned int x, unsigned int y, Neighbourhood const *neighbourhood) {
-
-    // Create the array to hold neighbour states
-    bool *neighbour_states = malloc(sizeof(bool) * neighbourhood->size);
+bool *neighbours(Environment const *env, unsigned int x, unsigned int y, Neighbourhood const *neighbourhood,
+                 bool *neighbour_states) {
 
     for (unsigned int i = 0; i < neighbourhood->size; i++) {
         // Calculate position of current neighbour in each of the 8 surrounding
@@ -109,12 +106,11 @@ unsigned int num_neighbours(Environment const *env, unsigned int x, unsigned int
                             Neighbourhood const *neighbourhood) {
 
     int neighbour_count = 0;
-    bool *neighbour_states = neighbours(env, x, y, neighbourhood); // Get neighbour states
+    bool neighbour_states[neighbourhood->size];
+    neighbours(env, x, y, neighbourhood, &neighbour_states[0]);
 
     for (int i = 0; i < neighbourhood->size; i++) {
-        neighbour_count += neighbour_states[i]; // 1 if true, 0 if false, so total
-                                                // will be number of alive states
+        neighbour_count += neighbour_states[i]; // 1 if true, 0 if false, so total will be number of alive states
     }
-    free(neighbour_states); // No longer used
     return neighbour_count;
 }
