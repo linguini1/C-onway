@@ -16,7 +16,7 @@ Run the executable and interact with the live simulation windows with the contro
 - Toggle pause/play with `space`.
 - Left click to toggle cells on the grid.
 - Press `c` to clear.
-- Press `esc` to quit.
+- Press `esc` or `q` to quit.
 - Increase or decrease the simulation speed using the `+`/`-` keys.
   - Press `m` to increase to max speed.
 - Switch cell types using the number keys.

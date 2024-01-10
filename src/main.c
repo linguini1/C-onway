@@ -102,15 +102,17 @@ int main(int argc, char *argv[]) {
         while (SDL_PollEvent(&event)) {
 
             // Quit program (esc)
-            if (event.type == SDL_QUIT || (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)) {
-                running = false;
-            }
+            if (event.type == SDL_QUIT) running = false;
 
             // Keypress events
             if (event.type == SDL_KEYDOWN) {
                 SDL_KeyCode key = event.key.keysym.sym;
 
                 switch (key) {
+                case SDLK_ESCAPE:
+                case SDLK_q:
+                    running = false;
+                    break;
                 case SDLK_SPACE:
                     playing = !playing;
                     break;
