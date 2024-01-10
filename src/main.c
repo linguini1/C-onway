@@ -5,6 +5,7 @@
  */
 #include "../include/palettes.h"
 #include "../include/rules.h"
+#include "SDL_keycode.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <stdbool.h>
@@ -15,20 +16,19 @@
 #error "FONT_PATH not defined with the path to a ttf font. See README."
 #endif // FONT_PATH
 
-// Constants
-const unsigned int DEFAULT_SCALE = 6;
-const unsigned int MAX_SCALE = 14;
-const unsigned int ZOOM_STEP = 1;
-const int MOVEMENT_STEP = 5;
-const float FONT_SCALE = 1.8f;
+#define DEFAULT_SCALE 6
+#define MAX_SCALE 14
+#define ZOOM_STEP 1
+#define MOVEMENT_STEP 5
+#define FONT_SCALE 1.8f
 const char WINDOW_NAME[] = "Conway's Game of Life Analyzer";
 
 // Simulation parameters
 const Palette GAME_PALETTES[] = {Casio,   MonitorGlow, Nokia3310, EndGame,   PaperAndDust,
                                  IBM8503, OngBit,      PaperBack, IronBlues, SpriteZero};
-const unsigned int DEFAULT_FRAME_DELAY = 100;
-const unsigned int MAX_FRAME_DELAY = 1000;
-const unsigned int FRAME_DELAY_STEP = 10;
+#define DEFAULT_FRAME_DELAY 100
+#define MAX_FRAME_DELAY 1000
+#define FRAME_DELAY_STEP 10
 #define FONT_SIZE 12
 
 int main(int argc, char *argv[]) {
@@ -108,46 +108,46 @@ int main(int argc, char *argv[]) {
             if (event.type == SDL_KEYDOWN) {
                 SDL_KeyCode key = event.key.keysym.sym;
 
-                // Pause & play
-                if (key == SDLK_SPACE) {
+                switch (key) {
+                case SDLK_SPACE:
                     playing = !playing;
-                }
-                // Speed controls
-                else if ((key == SDLK_MINUS || key == SDLK_KP_MINUS) &&
-                         environment->data.generation_speed <= MAX_FRAME_DELAY - FRAME_DELAY_STEP) {
-                    environment->data.generation_speed += FRAME_DELAY_STEP; // Slow down
-                } else if ((key == SDLK_PLUS || key == SDLK_EQUALS || key == SDLK_KP_PLUS) &&
-                           environment->data.generation_speed >= FRAME_DELAY_STEP) {
-                    environment->data.generation_speed -= FRAME_DELAY_STEP; // Speed up
-                } else if (key == SDLK_m) {
+                    break;
+                case SDLK_MINUS:
+                case SDLK_KP_MINUS:
+                    if (environment->data.generation_speed <= MAX_FRAME_DELAY - FRAME_DELAY_STEP)
+                        environment->data.generation_speed += FRAME_DELAY_STEP; // Speed up
+                    break;
+                case SDLK_PLUS:
+                case SDLK_EQUALS:
+                case SDLK_KP_PLUS:
+                    if (environment->data.generation_speed >= FRAME_DELAY_STEP)
+                        environment->data.generation_speed -= FRAME_DELAY_STEP; // Speed up
+                    break;
+                case SDLK_m:
                     environment->data.generation_speed = 0; // Max speed
-                }
-                // Switch cell types (keys between 0-9)
-                else if (0x30 <= key && key <= 0x39) {
-                    change_cell_type(&cell_type, key);
-                }
-                // Toggle dark mode
-                else if (key == SDLK_d) {
+                    break;
+                case SDLK_d:
                     dark_mode = !dark_mode;
-                }
-                // Toggle analytics
-                else if (key == SDLK_a) {
+                    break;
+                case SDLK_a:
                     analytics_on = !analytics_on;
-                }
-                // Clear simulation
-                else if (key == SDLK_c) {
+                    break;
+                case SDLK_c:
                     env_clear(environment);
-                }
-                // Cycle through themes
-                else if (key == SDLK_t) {
+                    break;
+                case SDLK_t:
                     palette = (palette + 1) % NUM_PALETTES;
+                    break;
+                default:
+                    if (0x30 <= key && key <= 0x39) change_cell_type(&cell_type, key);
+                    break;
                 }
             }
 
             // Mouse click or click and drag
             if (event.type == SDL_MOUSEBUTTONDOWN) {
-                unsigned int x = event.motion.x / (unsigned int)(DEFAULT_SCALE + zoom) - x_offset;
-                unsigned int y = event.motion.y / (unsigned int)(DEFAULT_SCALE + zoom) - y_offset;
+                unsigned int x = event.motion.x / (DEFAULT_SCALE + zoom) - x_offset;
+                unsigned int y = event.motion.y / (DEFAULT_SCALE + zoom) - y_offset;
 
                 // Coordinates must be within boundaries, otherwise the action will be ignored
                 if (env_in_bounds(environment, x, y)) {
@@ -187,8 +187,9 @@ int main(int argc, char *argv[]) {
         }
 
         // Clear screen
-        SDL_RenderSetScale(renderer, (float)(DEFAULT_SCALE + zoom), (float)(DEFAULT_SCALE + zoom)); // Scale for cells
-        set_draw_colour(renderer, &GAME_PALETTES[palette], !dark_mode);                             // Dead cell colour
+        SDL_RenderSetScale(renderer, (float)(DEFAULT_SCALE + zoom),
+                           (float)(DEFAULT_SCALE + zoom));              // Scale for cells
+        set_draw_colour(renderer, &GAME_PALETTES[palette], !dark_mode); // Dead cell colour
         SDL_RenderClear(renderer);
         set_draw_colour(renderer, &GAME_PALETTES[palette], dark_mode); // Living cell colour
 
