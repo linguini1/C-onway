@@ -1,8 +1,6 @@
-# Object files
+# Output files
 *.o
-
-# Binaries
-conway
+conway*
 
 # Debug & development
 compile_commands.json

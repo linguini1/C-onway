@@ -31,7 +31,7 @@ const unsigned int MAX_FRAME_DELAY = 1000;
 const unsigned int FRAME_DELAY_STEP = 10;
 #define FONT_SIZE 12
 
-int main(void) {
+int main(int argc, char *argv[]) {
 
     // OpenGL params
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);

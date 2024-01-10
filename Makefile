@@ -17,26 +17,43 @@ WARNINGS += -Wlogical-op -Wold-style-definition -Wcast-qual -Wdouble-promotion
 WARNINGS += -Wunsuffixed-float-constants -Wmissing-include-dirs -Wnormalized
 WARNINGS += -Wdisabled-optimization -Wsuggest-attribute=const
 
+### Font for text rendering ###
+FONT_PATH = ./src/uni0553.ttf
+FONT_DEFINE = -DFONT_PATH='"$(FONT_PATH)"'
+CFLAGS += $(FONT_DEFINE)
+
 ### COMPILER FLAGS ###
 CFLAGS += $(OPTIMIZATION)
-all: CFLAGS += $(shell sdl2-config --cflags --libs)
-all: CFLAGS += -lSDL2_ttf
+
+ifeq ($(OS),Windows_NT)
+# Windows SDL locations
+SDL_INC = C:/mingw64/SDL2-2.28.5/x86_64-w64-mingw32/include
+SDL_LINK = C:/mingw64/SDL2-2.28.5/x86_64-w64-mingw32/lib
+SDLTTF_INC = C:/mingw64/SDL2_ttf-2.20.2/x86_64-w64-mingw32/include
+SDLTTF_LINK = C:/mingw64/SDL2_ttf-2.20.2/x86_64-w64-mingw32/lib
+
+CFLAGS += -Dmain=SDL_main
+CFLAGS += -I$(SDL_INC) -I$(SDL_INC)/SDL2
+CFLAGS += -L$(SDL_LINK)
+CFLAGS += -I$(SDLTTF_INC)
+CFLAGS += -L$(SDLTTF_LINK)
+LINK_FLAGS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -mwindows
+else
+CFLAGS += $(shell sdl2-config --cflags --libs)
+LINK_FLAGS += -lSDL2_ttf
+endif
 
 ### SOURCE FILES ###
 SRCDIR = src
 SRC_FILES = $(wildcard $(SRCDIR)/*.c)
 OBJ_FILES = $(patsubst %.c,%.o,$(SRC_FILES))
 
-### Font for text rendering ###
-FONT_PATH = ./src/uni0553.ttf
-FONT_DEFINE = -DFONT_PATH='"$(FONT_PATH)"'
-CFLAGS += $(FONT_DEFINE)
 
 %.o: %.c
 	$(CC) $(CFLAGS) $(WARNINGS) -o $@ -c $<
 
 all: $(OBJ_FILES)
-	$(CC) $(CFLAGS) $^ -o $(OUT)
+	$(CC) $(CFLAGS) $^ $(LINK_FLAGS) -o $(OUT)
 
 clean:
 	@rm $(OBJ_FILES)
