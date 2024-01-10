@@ -5,6 +5,7 @@
  */
 
 #include "../include/neighbourhoods.h"
+#include <stdint.h>
 #include <stdlib.h>
 
 /* NEIGHBOURHOODS */
@@ -23,22 +24,22 @@ const Neighbourhood TRIPLE_MOORE_CORNER = {24, {TripleMooreCorner}};
  * @param coord The coordinate to be translated
  * @param x The x amount to translate the coordinate by
  * @param y The y amount to translate the coordinate by
- * @return A new coordinate which is the translated version of the passed
- * coordinate.
+ * @return A new coordinate which is the translated version of the passed coordinate.
  */
-Coordinate translate(Coordinate coord, int x, int y) { return (Coordinate){coord.x + x, coord.y + y}; }
+Coordinate __attribute__((const)) translate(Coordinate coord, int32_t x, int32_t y) {
+    return (Coordinate){coord.x + x, coord.y + y};
+}
 
 /**
  * Translates all coordinates in an array.
  * @param coords The array of coordinates to be translated.
  * @param len The length of the array
- * @param x The x amount to translate all coordinates by
- * @param y The y amount to translate all coordinates by
+ * @param x The x amount to translate all coordinates by.
+ * @param y The y amount to translate all coordinates by.
  */
-void translate_coordinates(Coordinate *coords, unsigned int len, int x, int y) {
-    for (unsigned int i = 0; i < len; i++) {
+void translate_coordinates(Coordinate *coords, size_t len, int32_t x, int32_t y) {
+    for (size_t i = 0; i < len; i++)
         coords[i] = translate(coords[i], x, y);
-    }
 }
 
 /**
@@ -50,20 +51,16 @@ void translate_coordinates(Coordinate *coords, unsigned int len, int x, int y) {
 Coordinate wrap(Environment const *env, Coordinate coord) {
     if (coord.x < 0) {
         coord.x += env->width;
-    }
-    if ((unsigned int)coord.x >= env->width) {
+    } else if ((unsigned int)coord.x >= env->width) {
         coord.x -= env->width;
     }
     if (coord.y < 0) {
         coord.y += env->height;
-    }
-    if ((unsigned int)coord.y >= env->height) {
+    } else if ((unsigned int)coord.y >= env->height) {
         coord.y -= env->height;
     }
     return coord;
 }
-
-/* NEIGHBOUR LOGIC */
 
 /**
  * Returns an array of 8 booleans representing the state of each of a cells 8
@@ -75,13 +72,13 @@ Coordinate wrap(Environment const *env, Coordinate coord) {
  * @param neighbour_states An empty buffer of `neighbourhood->size` booleans in which the states will be stored
  * @return An array of 8 booleans corresponding to the cell's 8 neighbours' states
  */
-bool *neighbours(Environment const *env, unsigned int x, unsigned int y, Neighbourhood const *neighbourhood,
+bool *neighbours(Environment const *env, uint32_t x, uint32_t y, Neighbourhood const *neighbourhood,
                  bool *neighbour_states) {
 
     for (unsigned int i = 0; i < neighbourhood->size; i++) {
         // Calculate position of current neighbour in each of the 8 surrounding cells
         Coordinate position = neighbourhood->neighbours[i];
-        Coordinate neighbour = {(int)x + position.x, (int)y + position.y};
+        Coordinate neighbour = {(int32_t)x + position.x, (int32_t)y + position.y};
         neighbour = wrap(env, neighbour); // If neighbour out of bounds, wrap around
 
         // Store states
@@ -101,14 +98,12 @@ bool *neighbours(Environment const *env, unsigned int x, unsigned int y, Neighbo
  * constant, in the order they appear
  * @return The number of living neighbours around the current cell
  */
-unsigned int num_neighbours(Environment const *env, unsigned int x, unsigned int y,
-                            Neighbourhood const *neighbourhood) {
-
-    int neighbour_count = 0;
+unsigned int num_neighbours(Environment const *env, uint32_t x, uint32_t y, Neighbourhood const *neighbourhood) {
+    uint8_t neighbour_count = 0;
     bool neighbour_states[neighbourhood->size];
     neighbours(env, x, y, neighbourhood, &neighbour_states[0]);
 
-    for (int i = 0; i < neighbourhood->size; i++) {
+    for (uint8_t i = 0; i < neighbourhood->size; i++) {
         neighbour_count += neighbour_states[i]; // 1 if true, 0 if false, so total will be number of alive states
     }
     return neighbour_count;

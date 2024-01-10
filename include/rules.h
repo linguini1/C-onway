@@ -12,14 +12,15 @@
 #include "neighbourhoods.h"
 #include <SDL2/SDL.h>
 
-typedef bool (*StateCalculator)(Environment const *, unsigned int, unsigned int);
+typedef bool (*StateCalculator)(Environment const *, uint32_t, uint32_t);
 
+/** Represents a type of cell. */
 typedef struct cell_type {
-    const char *name;
-    StateCalculator calculator;
+    const char *name;           /**< The name of the cell type. */
+    StateCalculator calculator; /**< The function to use for calculating the next state of a cell of this type. */
 } CellType;
 
-#define state_calculator(name) bool name(Environment const *env, unsigned int x, unsigned int y)
+#define state_calculator(name) bool name(Environment const *env, uint32_t x, uint32_t y)
 state_calculator(conway_next_state);
 state_calculator(maze_next_state);
 state_calculator(noise_next_state);
@@ -30,7 +31,6 @@ state_calculator(triple_moore_conway_next_state);
 state_calculator(conway_cancer_next_state);
 state_calculator(von_neumann_r2_conway_next_state);
 
-/* CELL TYPES */
 #define ConwayCell                                                                                                     \
     { "conway cell", conway_next_state }
 #define MazeCell                                                                                                       \
@@ -50,11 +50,7 @@ state_calculator(von_neumann_r2_conway_next_state);
 #define ConwayCancerCell                                                                                               \
     { "conway cancer cell", conway_cancer_next_state }
 
-/* NUMBER KEY TO CELL TYPE MAPPING FOR SIMULATION SELECTION */
-extern const CellType CELL_MAP[];
-
-void populate_analytics_string(char **string, Environment const *env, CellType *cell_type);
-void next_generation(Environment *env, CellType *cell_type);
-void change_cell_type(CellType *cell_type, SDL_KeyCode key);
+void populate_analytics_string(char **string, Environment const *env, CellType const *cell_type);
+void next_generation(Environment *env, CellType const *cell_type);
 
 #endif // CONWAY_RULES_H

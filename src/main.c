@@ -33,25 +33,30 @@ typedef struct {
     short unsigned int palette;
 } GameState;
 
-// Font path
 #ifndef FONT_PATH
 #error "FONT_PATH not defined with the path to a ttf font. See README."
 #endif // FONT_PATH
 
+#define FONT_SIZE 12
+#define FONT_SCALE 1.8f
 #define DEFAULT_SCALE 6
 #define MAX_SCALE 14
 #define ZOOM_STEP 1
 #define MOVEMENT_STEP 5
-#define FONT_SCALE 1.8f
-const char WINDOW_NAME[] = "Conway's Game of Life Analyzer";
-
-// Simulation parameters
-const Palette GAME_PALETTES[] = {Casio,   MonitorGlow, Nokia3310, EndGame,   PaperAndDust,
-                                 IBM8503, OngBit,      PaperBack, IronBlues, SpriteZero};
 #define DEFAULT_FRAME_DELAY 100
 #define MAX_FRAME_DELAY 1000
 #define FRAME_DELAY_STEP 10
-#define FONT_SIZE 12
+
+const char WINDOW_NAME[] = "Conway's Game of Life Analyzer";
+
+/** All of the possible colour palettes. */
+const Palette GAME_PALETTES[] = {Casio,   MonitorGlow, Nokia3310, EndGame,   PaperAndDust,
+                                 IBM8503, OngBit,      PaperBack, IronBlues, SpriteZero};
+/** Maps digit keys to cell types. */
+const CellType CELL_MAP[10] = {
+    ConwayCell,        ConwayCell,  LesseConwayCell, VonNeumannR2ConwayCell, TripleMooreConwayCell, MazeCell,
+    FractalCornerCell, FractalCell, NoiseCell,       ConwayCancerCell,
+};
 
 static GameState game_state = {
     .x_offset = 0,
@@ -170,7 +175,7 @@ int main(int argc, char *argv[]) {
                     game_state.palette = (game_state.palette + 1) % NUM_PALETTES;
                     break;
                 default:
-                    if (0x30 <= key && key <= 0x39) change_cell_type(&game_state.cell_type, key);
+                    if (0x30 <= key && key <= 0x39) game_state.cell_type = CELL_MAP[key - 48];
                     break;
                 }
             }

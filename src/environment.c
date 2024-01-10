@@ -4,9 +4,9 @@
  * @author Matteo Golin
  * @version 1.0
  */
-
 #include "../include/environment.h"
 #include <assert.h>
+#include <stdint.h>
 #include <stdlib.h>
 
 /**
@@ -16,9 +16,9 @@
  * @param height The height of the environment
  * @return a flattened 2D array of booleans representing the environment
  */
-Environment *env_init(unsigned int width, unsigned int height, unsigned int generation_speed) {
+Environment *env_init(uint32_t width, uint32_t height, uint16_t generation_speed) {
 
-    unsigned int size = width * height;
+    uint64_t size = width * height;
 
     // Create environment
     Environment *env = (Environment *)malloc(sizeof(Environment));
@@ -39,7 +39,6 @@ Environment *env_init(unsigned int width, unsigned int height, unsigned int gene
     env->data.initial_cells = 0;
     env->data.generations = 0;
     env->data.generation_speed = generation_speed;
-
     return env;
 }
 
@@ -58,8 +57,8 @@ void env_destroy(Environment *env) {
  * @param env The simulation environment to be cleared.
  */
 void env_clear(Environment *env) {
-    unsigned int size = env->width * env->height;
-    for (unsigned int i = 0; i < size; i++) {
+    uint64_t size = env->width * env->height;
+    for (uint64_t i = 0; i < size; i++) {
         env->grid[i] = false;
     }
 
@@ -79,7 +78,7 @@ void env_clear(Environment *env) {
  * @return The state of the cell at the provided coordinates.
  */
 bool env_access(Environment const *env, unsigned int x, unsigned int y) {
-    unsigned int i = ((env->width) * y) + x; // Calculate index
+    uint64_t i = ((env->width) * y) + x; // Calculate index
     return env->grid[i];
 }
 
@@ -91,8 +90,8 @@ bool env_access(Environment const *env, unsigned int x, unsigned int y) {
  * @param y The y coordinate of the location to be modified
  * @param value The value to be written to the (x, y) location
  */
-void env_write(Environment *env, unsigned int x, unsigned int y, bool value) {
-    unsigned int i = ((env->width) * y) + x; // Calculate index
+void env_write(Environment *env, uint32_t x, uint32_t y, bool value) {
+    uint64_t i = ((env->width) * y) + x; // Calculate index
     env->grid[i] = value;
 }
 
@@ -103,12 +102,8 @@ void env_write(Environment *env, unsigned int x, unsigned int y, bool value) {
  * @param y The y coordinate to be checked
  * @return true if (x, y) are within bounds, false otherwise
  */
-bool env_in_bounds(Environment const *env, unsigned int x, unsigned int y) {
-    unsigned int index = env->width * y + x;
-    if (index < env->width * env->height) {
-        return true;
-    }
-    return false;
+bool env_in_bounds(Environment const *env, uint32_t x, uint32_t y) {
+    return env->width * y + x < env->width * env->height;
 }
 
 /**
@@ -118,8 +113,8 @@ bool env_in_bounds(Environment const *env, unsigned int x, unsigned int y) {
  * @param y The y location of the cell to be toggled.
  * @return The new cell state.
  */
-bool env_toggle_cell(Environment *env, unsigned int x, unsigned int y) {
-    unsigned int i = ((env->width) * y) + x; // Calculate index
+bool env_toggle_cell(Environment *env, uint32_t x, uint32_t y) {
+    uint64_t i = ((env->width) * y) + x; // Calculate index
 
     // Update stats
     if (env->grid[i]) {

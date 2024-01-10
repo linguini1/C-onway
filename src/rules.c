@@ -4,17 +4,9 @@
  * @author Matteo Golin
  * @version 1.0
  */
-
 #include "../include/rules.h"
 #include "../include/asprintf.h"
 #include <stdlib.h>
-
-/* NUMBER KEY TO CELL TYPE MAPPING FOR SIMULATION SELECTION */
-// Each number key 0-9 maps directly to an index of this array.
-const CellType CELL_MAP[10] = {
-    ConwayCell,        ConwayCell,  LesseConwayCell, VonNeumannR2ConwayCell, TripleMooreConwayCell, MazeCell,
-    FractalCornerCell, FractalCell, NoiseCell,       ConwayCancerCell,
-};
 
 /**
  * Calculates the next state for the cell at (x, y) based on Conway's original Game of Life rules
@@ -217,7 +209,7 @@ state_calculator(conway_cancer_next_state) {
  * @param env The environment to gather analytics on
  * @param cell_type The cell type currently being used in the simulation
  */
-void populate_analytics_string(char **string, Environment const *env, CellType *cell_type) {
+void populate_analytics_string(char **string, Environment const *env, CellType const *cell_type) {
 
     SimulationAnalytics data = env->data;
     double percent_alive = ((double)(data.total_cells) / (double)(env->width * env->height)) * 100.0;
@@ -225,7 +217,7 @@ void populate_analytics_string(char **string, Environment const *env, CellType *
     double growth = ((double)data.total_cells / initial_cells) * 100.0;
 
     asprintf(string,
-             "cell type: %s\ngenerations: %llu\ninitial cells: %u\ncells: %lu\npercentage alive: %.3f%%\ngrowth: "
+             "cell type: %s\ngenerations: %llu\ninitial cells: %u\ncells: %u\npercentage alive: %.3f%%\ngrowth: "
              "%.1f%%\ngeneration length: %ums",
              cell_type->name, data.generations, data.initial_cells, data.total_cells, percent_alive, growth,
              data.generation_speed);
@@ -236,18 +228,17 @@ void populate_analytics_string(char **string, Environment const *env, CellType *
  * @param env The environment to update with the next generation
  * @param cell_type The type of cell to calculate the next generation for
  */
-void next_generation(Environment *env, CellType *cell_type) {
+void next_generation(Environment *env, CellType const *cell_type) {
 
     env->data.total_cells = 0; // Reset cell total
     env->data.generations++;   // Increase generations
 
     // Update the next generation with all the new states
-    for (unsigned int x = 0; x < env->width; x++) {
-        for (unsigned int y = 0; y < env->height; y++) {
+    for (uint32_t x = 0; x < env->width; x++) {
+        for (uint32_t y = 0; y < env->height; y++) {
             bool state = cell_type->calculator(env, x, y);
-            env->data.total_cells += state; // Increase cell total
-            // Write next state onto the next generation grid
-            env->_next_generation[(env->width * y) + x] = state;
+            env->data.total_cells += state;                      // Increase cell total
+            env->_next_generation[(env->width * y) + x] = state; // Write next state onto the next generation grid
         }
     }
 
@@ -255,20 +246,4 @@ void next_generation(Environment *env, CellType *cell_type) {
     bool *temp = env->grid;
     env->grid = env->_next_generation;
     env->_next_generation = temp;
-}
-
-/**
- * Resets the cell type to the specified cell type.
- * @param cell_type A pointer to the current cell type variable being used by the game
- */
-void change_cell_type(CellType *cell_type, SDL_KeyCode key) {
-
-    // SDL2 uses chars 0-9 to represent keys 0-9.
-    // In UTF-8 encoding, 0-9 is represented by integers 48-57.
-    // Subtract 48 from SDL_Key to get the original digit.
-    // Use this index to map to the corresponding cell in the CELL_MAP constant.
-
-    unsigned short int index = (unsigned short int)key - 48;
-    if (index > 9) return; // Prevent exceeding array length
-    *cell_type = CELL_MAP[index];
 }
